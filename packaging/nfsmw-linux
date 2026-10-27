@@ -1,0 +1,52 @@
+#!/bin/bash
+# nfsmw-linux: starts Need for Speed: Most Wanted Black Edition (native Linux build).
+# The first start builds the game from your own copy (nfsmw-linux-build);
+# later starts go straight to the game.
+#
+#   nfsmw-linux [--windowed] [--borderless] [--fullscreen] [--rebuild]
+set -euo pipefail
+
+DATA="${NFSMW_DATA_DIR:-/usr/share/nfsmw-linux}"
+LIB="${NFSMW_LIB_DIR:-/usr/lib/nfsmw-linux}"
+HOME_DIR="${NFSMW_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/nfsmw-linux}"
+VERSION="@VERSION@"
+
+export NFSMW_DATA_DIR="$DATA"
+export NFSMW_LIB_DIR="$LIB"
+export NFSMW_HOME="$HOME_DIR"
+
+REBUILD=0
+ARGS=()
+for a in "$@"; do
+    case "$a" in
+        --windowed) export NFSMW_WINDOWED=1 ;;
+        --borderless) export NFSMW_BORDERLESS=1 ;;
+        --fullscreen) export NFSMW_FULLSCREEN=1 ;;
+        --rebuild) REBUILD=1 ;;
+        *) ARGS+=("$a") ;;
+    esac
+done
+
+GUI=""
+[[ -t 1 ]] || GUI="--gui"
+
+stamp_version=$(cut -d' ' -f1 "$HOME_DIR/bin/.stamp" 2>/dev/null || true)
+if [[ $REBUILD == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then
+    if [[ -z $GUI ]]; then
+        nfsmw-linux-build $([[ $REBUILD == 1 ]] && echo --force) || exit 1
+    elif command -v zenity >/dev/null 2>&1; then
+        nfsmw-linux-build --gui $([[ $REBUILD == 1 ]] && echo --force) || exit 1
+    elif command -v x-terminal-emulator >/dev/null 2>&1; then
+        x-terminal-emulator -e bash -c "nfsmw-linux-build; echo; read -rp 'Press Enter to close...'" || exit 1
+        [[ -x $HOME_DIR/bin/MOSTWANTED ]] || exit 1
+    else
+        nfsmw-linux-build $([[ $REBUILD == 1 ]] && echo --force) || exit 1
+    fi
+fi
+
+# Intel HD Graphics / Mesa: keep the Vulkan pipeline cache with game data
+export MESA_SHADER_CACHE_DIR="${MESA_SHADER_CACHE_DIR:-$HOME_DIR/mesa_cache}"
+mkdir -p "$MESA_SHADER_CACHE_DIR"
+
+cd "$HOME_DIR" || exit 1
+exec "$HOME_DIR/bin/MOSTWANTED" "${ARGS[@]}"
