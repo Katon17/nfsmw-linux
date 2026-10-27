@@ -3,10 +3,11 @@
 # (Black Edition) from YOUR OWN copy of the original Xbox game.
 #
 # The package ships no game code or proprietary assets. This script:
-# 1. Extracts or locates default.xbe from your USA Black Edition ISO or folder.
-# 2. Recompiles the x86 machine code to C++ using XboxXBE-Recomp.
-# 3. Compiles the generated C++ files with clang++ / lld.
-# 4. Links with the native SDL3 + Vulkan Linux desktop host into:
+# 1. Prompts you to pick your Xbox ISO or folder via a file chooser dialog.
+# 2. Extracts default.xbe from your USA Black Edition ISO or folder.
+# 3. Recompiles the x86 machine code to C++ using XboxXBE-Recomp.
+# 4. Compiles the generated C++ files with clang++ / lld.
+# 5. Links with the native SDL3 + Vulkan Linux desktop host into:
 #      ~/.local/share/nfsmw-linux/bin/MOSTWANTED
 #
 # Usage:
@@ -28,12 +29,16 @@ while (($#)); do
         --gui) GUI=1 ;;
         --jobs) shift; JOBS="${1:-}" ;;
         --force) FORCE=1 ;;
-        -h|--help) sed -n 2,13p "$0"; exit 0 ;;
+        -h|--help) sed -n 2,14p "$0"; exit 0 ;;
         *) SOURCE="$1" ;;
     esac
     shift
 done
-[[ $GUI == 1 ]] && ! command -v zenity >/dev/null 2>&1 && GUI=0
+
+# If stdout is not a terminal, enable GUI automatically if zenity is installed
+if [[ $GUI == 0 ]] && ! [[ -t 1 ]] && command -v zenity >/dev/null 2>&1; then
+    GUI=1
+fi
 
 say() { echo "  $*"; }
 fail() {
@@ -42,7 +47,9 @@ fail() {
     echo -e "  ERROR: $*"
     echo "  ========================================================"
     echo ""
-    [[ $GUI == 1 ]] && zenity --error --title="Need for Speed: Most Wanted (Black Edition)" --width=500 --text="$*" 2>/dev/null
+    if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
+        zenity --error --title="Need for Speed: Most Wanted (Black Edition)" --width=520 --text="$*" 2>/dev/null || true
+    fi
     exit 1
 }
 
@@ -67,11 +74,11 @@ for f in /usr/lib/x86_64-linux-gnu/libvulkan.so.1 /usr/lib64/libvulkan.so.1 /usr
 done
 [[ -n $VK ]] || fail "libvulkan.so.1 is missing. Install via:\n  sudo apt install libvulkan1 mesa-vulkan-drivers"
 
-# ------------------------------------------------------------------ Locate game copy
-find_game() {
+# ------------------------------------------------------------------ Locate or Pick Game Copy
+find_game_auto() {
     local dirs=()
     [[ -n ${NFSMW_GAME_DIR:-} ]] && dirs+=("$NFSMW_GAME_DIR")
-    dirs+=("$HOME_DIR/game" "$HOME_DIR/assets" "$HOME/Games/MostWanted" "$HOME/Games/NFSMW" "$HOME/Downloads")
+    dirs+=("$HOME_DIR/game" "$HOME_DIR/assets" "$HOME/Games/MostWanted" "$HOME/Games/NFSMW")
     for d in "${dirs[@]}"; do
         [[ -d $d ]] || continue
         for x in "$d"/default.xbe "$d"/DEFAULT.XBE "$d"/Default.xbe; do
@@ -84,79 +91,115 @@ find_game() {
     return 1
 }
 
-if [[ -n $SOURCE ]]; then
-    SOURCE=$(realpath "$SOURCE") || fail "$SOURCE does not exist"
-    if [[ -d $SOURCE ]]; then
-        [[ -f $SOURCE/default.xbe || -f $SOURCE/DEFAULT.XBE ]] || fail "$SOURCE has no default.xbe"
-        rmdir "$HOME_DIR/game" 2>/dev/null || true
-        [[ -e $HOME_DIR/game ]] || ln -s "$SOURCE" "$HOME_DIR/game"
-        if [[ -f $SOURCE/default.xbe ]]; then
-            SOURCE="$SOURCE/default.xbe"
+while true; do
+    GAME_FILE=""
+    if [[ -n $SOURCE ]]; then
+        GAME_FILE="$SOURCE"
+    else
+        # If GUI is available, immediately open file chooser so the user does NOT have to place anything manually!
+        if command -v zenity >/dev/null 2>&1; then
+            PICK=$(zenity --file-selection \
+                --title="Pilih File ISO Need for Speed: Most Wanted (Black Edition)" \
+                --file-filter="Xbox Game ISO (*.iso, default.xbe) | *.iso *.ISO *.xiso.iso default.xbe DEFAULT.XBE" \
+                2>/dev/null || true)
+            if [[ -z $PICK ]]; then
+                echo "Pemilihan file dibatalkan oleh pengguna."
+                exit 0
+            fi
+            GAME_FILE="$PICK"
         else
-            SOURCE="$SOURCE/DEFAULT.XBE"
+            GAME_FILE="$(find_game_auto || true)"
+            if [[ -z $GAME_FILE ]]; then
+                read -e -p "Masukkan jalur lengkap ke file .iso game Anda: " GAME_FILE
+            fi
         fi
-    else
-        ln -sf "$SOURCE" "$HOME_DIR/game/$(basename "$SOURCE")"
     fi
-fi
-GAME_FILE="${SOURCE:-$(find_game || true)}"
 
-if [[ -z $GAME_FILE && $GUI == 1 ]]; then
-    zenity --info --title="Need for Speed: Most Wanted" --width=520 \
-        --text="Please select your copy of Need for Speed: Most Wanted (Black Edition) for original Xbox:\n\n• An Xbox disc image (.iso), or\n• default.xbe inside your extracted game directory." 2>/dev/null
-    PICK=$(zenity --file-selection --title="NFSMW: Select .iso or default.xbe" \
-           --file-filter="Xbox Disc / XBE (*.iso, default.xbe) | *.iso *.ISO default.xbe DEFAULT.XBE" 2>/dev/null) || exit 1
-    if [[ ${PICK,,} == *.iso ]]; then
-        ln -sf "$PICK" "$HOME_DIR/game/$(basename "$PICK")"
-    else
+    [[ -n $GAME_FILE ]] || fail "Tidak ada file ISO yang dipilih."
+    GAME_FILE=$(realpath "$GAME_FILE" 2>/dev/null || echo "$GAME_FILE")
+    [[ -e $GAME_FILE ]] || fail "File '$GAME_FILE' tidak ditemukan."
+
+    if [[ -d $GAME_FILE ]]; then
+        if [[ -f $GAME_FILE/default.xbe ]]; then
+            ACTUAL_TARGET="$GAME_FILE/default.xbe"
+        elif [[ -f $GAME_FILE/DEFAULT.XBE ]]; then
+            ACTUAL_TARGET="$GAME_FILE/DEFAULT.XBE"
+        else
+            fail "Folder '$GAME_FILE' tidak berisi default.xbe."
+        fi
         rmdir "$HOME_DIR/game" 2>/dev/null || true
-        [[ -e $HOME_DIR/game ]] || ln -s "$(dirname "$PICK")" "$HOME_DIR/game"
+        [[ -e $HOME_DIR/game ]] || ln -s "$GAME_FILE" "$HOME_DIR/game"
+        GAME_FILE="$ACTUAL_TARGET"
     fi
-    GAME_FILE="$PICK"
-fi
-[[ -n $GAME_FILE ]] || fail "No game files found. Please put your Xbox Need for Speed: Most Wanted Black Edition .iso or extracted folder into:\n  $HOME_DIR/game\nand run nfsmw-linux-build again."
-say "Detected game copy: $GAME_FILE"
 
-XBE="$WORK/default.xbe"
-if [[ ${GAME_FILE,,} == *.iso ]]; then
-    say "Extracting default.xbe from Xbox disc image..."
-    python3 -I "$DATA/tools/xdvdfs.py" "$GAME_FILE" default.xbe "$XBE" >>"$LOG" 2>&1 \
-        || python3 -I "$DATA/tools/xdvdfs.py" "$GAME_FILE" DEFAULT.XBE "$XBE" >>"$LOG" 2>&1 \
-        || fail "default.xbe could not be read from $GAME_FILE (is this a valid Xbox ISO?). See $LOG"
-else
-    cp -f "$GAME_FILE" "$XBE" || fail "cannot read $GAME_FILE"
-fi
+    say "File game yang dipilih: $GAME_FILE"
+    XBE="$WORK/default.xbe"
+    rm -f "$XBE"
 
-IMAGE_SHA=$(sha1sum "$XBE" | cut -d' ' -f1)
-say "Executable SHA-1: $IMAGE_SHA"
-if [[ $IMAGE_SHA != "$USA_BLACK_SHA1" ]]; then
-    say "WARNING: SHA-1 does not match expected USA Black Edition ($USA_BLACK_SHA1)."
-    say "Attempting build anyway..."
-fi
+    if [[ ${GAME_FILE,,} == *.iso ]]; then
+        say "Mengekstrak default.xbe dari disc image Xbox..."
+        python3 -I "$DATA/tools/xdvdfs.py" "$GAME_FILE" default.xbe "$XBE" >>"$LOG" 2>&1 \
+            || python3 -I "$DATA/tools/xdvdfs.py" "$GAME_FILE" DEFAULT.XBE "$XBE" >>"$LOG" 2>&1 \
+            || {
+                MSG="Gagal membaca default.xbe dari $GAME_FILE.\nApakah ini file ISO Xbox asli?"
+                if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
+                    zenity --error --title="Bukan ISO Xbox Asli" --width=500 --text="$MSG" 2>/dev/null || true
+                    SOURCE="" # reset to re-prompt
+                    continue
+                else
+                    fail "$MSG"
+                fi
+            }
+    else
+        cp -f "$GAME_FILE" "$XBE" || fail "Tidak dapat membaca $GAME_FILE"
+    fi
 
-STAMP="$VERSION $IMAGE_SHA"
-if [[ $FORCE == 0 && -x $HOME_DIR/bin/MOSTWANTED && "$(cat "$HOME_DIR/bin/.stamp" 2>/dev/null)" == "$STAMP" ]]; then
-    say "Game executable is already up-to-date: $HOME_DIR/bin/MOSTWANTED"
-    exit 0
-fi
+    IMAGE_SHA=$(sha1sum "$XBE" | cut -d' ' -f1)
+    say "Executable SHA-1: $IMAGE_SHA"
 
-# ------------------------------------------------------------------ Step 1: Recompile
-FLAGS="-std=c++20 -O2 -w -fno-strict-aliasing -fsigned-char -march=$MARCH"
-KEY=$( { sha1sum "$LIB/xbe_recomp" "$DATA/config/game.toml"; find "$DATA/sdk" -type f \( -name '*.h' -o -name '*.toml' \) | sort | xargs sha1sum; echo "$FLAGS $IMAGE_SHA $($CXX --version | head -n1)"; } | sha1sum | cut -c1-12)
-GEN="$WORK/gen-$KEY"
-OBJ="$WORK/obj-$KEY"
-for d in "$WORK"/gen-* "$WORK"/obj-* "$WORK"/gen; do
-    [[ -e $d && $d != "$GEN" && $d != "$OBJ" ]] && rm -rf "$d"
+    # Step 1: Test recompile
+    FLAGS="-std=c++20 -O2 -w -fno-strict-aliasing -fsigned-char -march=$MARCH"
+    KEY=$( { sha1sum "$LIB/xbe_recomp" "$DATA/config/game.toml"; find "$DATA/sdk" -type f \( -name '*.h' -o -name '*.toml' \) | sort | xargs sha1sum; echo "$FLAGS $IMAGE_SHA $($CXX --version | head -n1)"; } | sha1sum | cut -c1-12)
+    GEN="$WORK/gen-$KEY"
+    OBJ="$WORK/obj-$KEY"
+
+    say "[1/3] Menjalankan recompiler Xbox XBE ke C++ ..."
+    if ! "$LIB/xbe_recomp" "$DATA/config/game.toml" "$XBE" "$GEN" --xdk "$DATA/sdk/xdk" >>"$LOG" 2>&1; then
+        LOG_TAIL=$(tail -n 6 "$LOG")
+        if echo "$LOG_TAIL" | grep -q "45410083"; then
+            ERR_TEXT="File ISO yang Anda pilih berisi game 'BLACK' (FPS), BUKAN 'Need for Speed: Most Wanted'!\n\nDetail:\n• Title ID ISO Anda: 45410083 (BLACK)\n• Title ID yang dibutuhkan: 4541007B (Need for Speed Most Wanted)\n\nSilakan pilih file ISO Need for Speed: Most Wanted Black Edition yang benar."
+        else
+            ERR_TEXT="Recompiler gagal memproses file ISO ini:\n\n$LOG_TAIL\n\nPastikan file ISO Anda adalah Need for Speed: Most Wanted Black Edition (original Xbox USA release)."
+        fi
+
+        if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
+            if zenity --question --title="File ISO Tidak Cocok" --width=520 \
+                --ok-label="Pilih File ISO Lain" --cancel-label="Keluar" \
+                --text="$ERR_TEXT" 2>/dev/null; then
+                SOURCE="" # loop back to file chooser
+                continue
+            else
+                exit 1
+            fi
+        else
+            fail "$ERR_TEXT"
+        fi
+    fi
+
+    # Check symbols
+    if ! cmp -s "$GEN/image_symbols.h" "$LIB/image_symbols.h"; then
+        fail "Simbol hasil rekompilasi tidak cocok dengan host runtime. Pastikan versi XBE sesuai rilis USA Black Edition."
+    fi
+
+    # If we made it here, ISO is valid and recompiled!
+    if [[ ${GAME_FILE,,} == *.iso ]]; then
+        ln -sf "$GAME_FILE" "$HOME_DIR/game/$(basename "$GAME_FILE")"
+    fi
+    break
 done
 
-say "[1/3] Recompiling Xbox XBE executable to C++ ..."
-"$LIB/xbe_recomp" "$DATA/config/game.toml" "$XBE" "$GEN" --xdk "$DATA/sdk/xdk" >>"$LOG" 2>&1 \
-    || fail "The recompiler failed. Ensure your copy is Need for Speed: Most Wanted Black Edition. See $LOG"
-
-cmp -s "$GEN/image_symbols.h" "$LIB/image_symbols.h" \
-    || fail "Recompiled symbols do not match the host runtime. Check config/game.toml and your XBE version."
-
 # ------------------------------------------------------------------ Step 2: Compile
+say "[2/3] Mengompilasi modul C++ game untuk prosesor PC Anda..."
 SOURCES=("$GEN"/x86_func_mapping.cpp "$GEN"/x86_recomp.*.cpp)
 TOTAL=${#SOURCES[@]}
 if [[ -z $JOBS ]]; then
@@ -168,9 +211,9 @@ fi
 
 DONE=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l)
 if (( DONE >= TOTAL )); then
-    say "[2/3] All $TOTAL compiled objects exist from cache: skipping to link stage."
+    say "Semua $TOTAL modul telah dikompilasi sebelumnya: langsung ke tahap link."
 else
-    say "[2/3] Compiling $TOTAL parts using $JOBS parallel jobs (one-time process) ..."
+    say "Mengompilasi $TOTAL modul dengan $JOBS proses paralel (hanya berjalan 1 kali saat pertama)..."
 fi
 
 mkdir -p "$OBJ"
@@ -189,8 +232,8 @@ progress() {
     while (( done < TOTAL )); do
         done=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l)
         echo $(( done * 100 / TOTAL ))
-        echo "# Compiling NFSMW: $done / $TOTAL modules..."
-        sleep 3
+        echo "# Mengompilasi NFSMW: $done / $TOTAL modul selesai..."
+        sleep 2
         kill -0 "$1" 2>/dev/null || break
     done
 }
@@ -198,23 +241,23 @@ progress() {
 printf '%s\n' "${SOURCES[@]}" | xargs -P "$JOBS" -I{} bash -c 'compile_one "$@"' _ {} &
 CPID=$!
 
-if [[ $GUI == 1 ]]; then
+if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
     progress $CPID | zenity --progress --title="Need for Speed: Most Wanted" --width=500 --auto-close --no-cancel \
-        --text="Compiling game modules for your PC..." 2>/dev/null &
+        --text="Mengompilasi game untuk perangkat Linux Anda..." 2>/dev/null || true
     wait $CPID; RC=$?
 else
     while kill -0 $CPID 2>/dev/null; do
         n=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l)
-        printf '\r      Compiled %d / %d modules' "$n" "$TOTAL"
-        sleep 4
+        printf '\r      Proses kompilasi: %d / %d modul' "$n" "$TOTAL"
+        sleep 3
     done
     wait $CPID; RC=$?
     echo ""
 fi
-(( RC == 0 )) || fail "Compilation failed (out of memory? try: nfsmw-linux-build --jobs 1). See $LOG"
+(( RC == 0 )) || fail "Kompilasi gagal (memori tidak cukup? Coba: nfsmw-linux-build --jobs 1). Cek log: $LOG"
 
 # ------------------------------------------------------------------ Step 3: Link
-say "[3/3] Linking native Linux executable ..."
+say "[3/3] Melakukan linking binary Linux native (MOSTWANTED)..."
 echo "extern const char kImageSha1[] = \"$IMAGE_SHA\";" > "$WORK/image_sha1.cpp"
 $CXX $FLAGS -c "$WORK/image_sha1.cpp" -o "$WORK/image_sha1.o" 2>>"$LOG" || fail "see $LOG"
 
@@ -226,21 +269,24 @@ done
 $CXX -fuse-ld=lld -o "$HOME_DIR/bin/MOSTWANTED.new" "${OBJS[@]}" "$WORK/image_sha1.o" \
     -Wl,--whole-archive "$LIB/libnfsmw_host.a" -Wl,--no-whole-archive \
     -Wl,--start-group $(cat "$LIB/link-libs.txt" | sed "s|^|$LIB/|") -Wl,--end-group \
-    "$VK" -lpthread -ldl -lm -lrt >>"$LOG" 2>&1 || fail "Linking failed. See $LOG"
+    "$VK" -lpthread -ldl -lm -lrt >>"$LOG" 2>&1 || fail "Linking gagal. Cek log: $LOG"
 
 mv -f "$HOME_DIR/bin/MOSTWANTED.new" "$HOME_DIR/bin/MOSTWANTED"
 chmod 755 "$HOME_DIR/bin/MOSTWANTED"
+STAMP="$VERSION $IMAGE_SHA"
 echo "$STAMP" > "$HOME_DIR/bin/.stamp"
 
 say ""
 say "======================================================================"
-say "  Build complete! Native binary ready at:"
+say "  BERHASIL! Binary native telah dibuat di:"
 say "  $HOME_DIR/bin/MOSTWANTED"
-say "  Launch anytime with: nfsmw-linux"
+say "  Game sekarang siap dimainkan!"
 say "======================================================================"
 say ""
 
-[[ $GUI == 1 ]] && zenity --info --title="Need for Speed: Most Wanted" --width=420 \
-    --text="Build complete!\nNeed for Speed: Most Wanted Black Edition is ready to play." 2>/dev/null &
+if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
+    zenity --info --title="Need for Speed: Most Wanted" --width=420 \
+        --text="Kompilasi berhasil!\nNeed for Speed: Most Wanted Black Edition siap dimainkan." 2>/dev/null &
+fi
 
 exit 0

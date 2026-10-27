@@ -1,9 +1,9 @@
 #!/bin/bash
 # nfsmw-linux: starts Need for Speed: Most Wanted Black Edition (native Linux build).
-# The first start builds the game from your own copy (nfsmw-linux-build);
-# later starts go straight to the game.
+# If the game has not been built yet, it automatically opens a file chooser to let you select your ISO.
 #
-#   nfsmw-linux [--windowed] [--borderless] [--fullscreen] [--rebuild]
+# Usage:
+#   nfsmw-linux [--windowed] [--borderless] [--fullscreen] [--rebuild] [--change-iso]
 set -euo pipefail
 
 DATA="${NFSMW_DATA_DIR:-/usr/share/nfsmw-linux}"
@@ -16,6 +16,7 @@ export NFSMW_LIB_DIR="$LIB"
 export NFSMW_HOME="$HOME_DIR"
 
 REBUILD=0
+CHANGE_ISO=0
 ARGS=()
 for a in "$@"; do
     case "$a" in
@@ -23,28 +24,23 @@ for a in "$@"; do
         --borderless) export NFSMW_BORDERLESS=1 ;;
         --fullscreen) export NFSMW_FULLSCREEN=1 ;;
         --rebuild) REBUILD=1 ;;
+        --change-iso) CHANGE_ISO=1 ;;
         *) ARGS+=("$a") ;;
     esac
 done
 
-GUI=""
-[[ -t 1 ]] || GUI="--gui"
-
 stamp_version=$(cut -d' ' -f1 "$HOME_DIR/bin/.stamp" 2>/dev/null || true)
-if [[ $REBUILD == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then
-    if [[ -z $GUI ]]; then
-        nfsmw-linux-build $([[ $REBUILD == 1 ]] && echo --force) || exit 1
-    elif command -v zenity >/dev/null 2>&1; then
-        nfsmw-linux-build --gui $([[ $REBUILD == 1 ]] && echo --force) || exit 1
-    elif command -v x-terminal-emulator >/dev/null 2>&1; then
-        x-terminal-emulator -e bash -c "nfsmw-linux-build; echo; read -rp 'Press Enter to close...'" || exit 1
-        [[ -x $HOME_DIR/bin/MOSTWANTED ]] || exit 1
-    else
-        nfsmw-linux-build $([[ $REBUILD == 1 ]] && echo --force) || exit 1
-    fi
+if [[ $REBUILD == 1 || $CHANGE_ISO == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then
+    GUI_FLAG=""
+    command -v zenity >/dev/null 2>&1 && GUI_FLAG="--gui"
+    nfsmw-linux-build $GUI_FLAG $([[ $REBUILD == 1 || $CHANGE_ISO == 1 ]] && echo --force) || exit 1
 fi
 
-# Intel HD Graphics / Mesa: keep the Vulkan pipeline cache with game data
+if [[ ! -x $HOME_DIR/bin/MOSTWANTED ]]; then
+    exit 0
+fi
+
+# Intel HD Graphics / Mesa: keep Vulkan pipeline cache isolated
 export MESA_SHADER_CACHE_DIR="${MESA_SHADER_CACHE_DIR:-$HOME_DIR/mesa_cache}"
 mkdir -p "$MESA_SHADER_CACHE_DIR"
 
