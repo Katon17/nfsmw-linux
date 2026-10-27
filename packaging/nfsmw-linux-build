@@ -39,7 +39,7 @@ say() { echo "  $*"; }
 fail() {
     echo ""
     echo "  ========================================================"
-    echo "  ERROR: $*"
+    echo -e "  ERROR: $*"
     echo "  ========================================================"
     echo ""
     [[ $GUI == 1 ]] && zenity --error --title="Need for Speed: Most Wanted (Black Edition)" --width=500 --text="$*" 2>/dev/null
