@@ -72,32 +72,45 @@ constexpr int kStart = 12;
 constexpr int kFirstMoveKey = 16;
 constexpr int kStickMax = 32767;
 // the controller's buttons and sticks, each a key of its own
+// Default layout tuned specifically for Need for Speed: Most Wanted PC racing controls:
+// - Gas: W or Up Arrow (Right Trigger)
+// - Brake/Reverse: S or Down Arrow (Left Trigger)
+// - Steer: A / Left Arrow and D / Right Arrow (Left Stick)
+// - Handbrake: Spacebar (Button A)
+// - Nitrous (NOS): Left Shift or N (Button B)
+// - Speedbreaker: X or Ctrl (Button X)
+// - Look Back: C or L (Button Y)
+// - Camera View: V (Black Button)
+// - Horn: H (White Button)
+// - Pause: Escape (Start)
+// - Reset Car / GPS Map: R or Tab (Back)
+// - Event / Safehouse: Enter or Up (D-Pad Up)
 constexpr Target kActions[] = {
-    {{"move_up", "LEFT STICK UP", "W"}, 16},
-    {{"move_down", "LEFT STICK DOWN", "S"}, 17},
-    {{"move_left", "LEFT STICK LEFT", "A"}, 18},
-    {{"move_right", "LEFT STICK RIGHT", "D"}, 19},
-    {{"button_a", "A", "Space,K"}, 0},
-    {{"button_b", "B", "L"}, 1},
-    {{"button_x", "X", "J"}, 2},
-    {{"button_y", "Y", "I"}, 3},
-    {{"button_black", "BLACK", "O"}, 4},
-    {{"button_white", "WHITE", "U"}, 5},
-    {{"trigger_left", "LEFT TRIGGER", "Q"}, 6},
-    {{"trigger_right", "RIGHT TRIGGER", "E"}, 7},
-    {{"dpad_up", "DPAD UP", "Up"}, 8},
-    {{"dpad_down", "DPAD DOWN", "Down"}, 9},
-    {{"dpad_left", "DPAD LEFT", "Left"}, 10},
-    {{"dpad_right", "DPAD RIGHT", "Right"}, 11},
-    {{"start", "START", "Enter,Escape"}, kStart},
-    {{"back", "BACK", "Backspace,Tab"}, 13},
-    {{"thumb_left", "LEFT THUMB", "C"}, 14},
-    {{"thumb_right", "RIGHT THUMB", "V"}, 15},
-    {{"settings_panel", "SETTINGS PANEL", "F10"}, kHostKey},
-    {{"look_up", "RIGHT STICK UP", "Numpad8"}, 20},
-    {{"look_down", "RIGHT STICK DOWN", "Numpad5"}, 21},
-    {{"look_left", "RIGHT STICK LEFT", "Numpad4"}, 22},
-    {{"look_right", "RIGHT STICK RIGHT", "Numpad6"}, 23},
+    {{"trigger_right", "GAS / ACCELERATE", "W,Up"}, 7},
+    {{"trigger_left", "BRAKE / REVERSE", "S,Down"}, 6},
+    {{"move_left", "STEER LEFT", "A,Left"}, 18},
+    {{"move_right", "STEER RIGHT", "D,Right"}, 19},
+    {{"button_a", "HANDBRAKE (A / ENTER)", "Space,Enter"}, 0},
+    {{"button_b", "NITROUS (B / CANCEL)", "Shift,Backspace"}, 1},
+    {{"button_x", "SPEEDBREAKER (X)", "X,Ctrl"}, 2},
+    {{"button_y", "LOOK BACK (Y)", "C,L"}, 3},
+    {{"button_black", "CHANGE CAMERA", "V"}, 4},
+    {{"button_white", "HORN", "H"}, 5},
+    {{"dpad_up", "ENGAGE EVENT / UP", "Up,E"}, 8},
+    {{"dpad_down", "BLACKLIST / DOWN", "Down"}, 9},
+    {{"dpad_left", "WORLD MAP / LEFT", "Left,M"}, 10},
+    {{"dpad_right", "SMS / RIGHT", "Right,B"}, 11},
+    {{"start", "PAUSE (START)", "Escape,P"}, kStart},
+    {{"back", "RESET CAR (BACK)", "R,Tab"}, 13},
+    {{"move_up", "LEFT STICK UP", "Numpad8"}, 16},
+    {{"move_down", "LEFT STICK DOWN", "Numpad2"}, 17},
+    {{"thumb_left", "LEFT THUMB", "Z"}, 14},
+    {{"thumb_right", "RIGHT THUMB", "Numpad0"}, 15},
+    {{"settings_panel", "SETTINGS PANEL", "F10,Backtick"}, kHostKey},
+    {{"look_up", "LOOK UP", "Numpad8"}, 20},
+    {{"look_down", "LOOK DOWN", "Numpad5"}, 21},
+    {{"look_left", "LOOK LEFT", "Numpad4"}, 22},
+    {{"look_right", "LOOK RIGHT", "Numpad6"}, 23},
 };
 constexpr size_t kCount = std::size(kActions);
 constexpr size_t HostAction(std::string_view id) {

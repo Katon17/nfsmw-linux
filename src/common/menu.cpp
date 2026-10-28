@@ -305,7 +305,7 @@ constexpr Row kCheatRows[] = {
 };
 
 // the credits' names, an info row's id; as they are, untranslated
-const char* const kCreditNames[] = {"Rangga Casper", "Zukiru", "bagasromadon", "TGP482",
+const char* const kCreditNames[] = {"Katon Bagaskoro", "Zukiru", "bagasromadon", "TGP482",
                                     "SDL, glslang, toml++, Dear ImGui", "xemu, Cxbx-Reloaded"};
 
 // a page of its own: who made the port, and the links to support it
@@ -750,7 +750,7 @@ void DrawTitle() {
     ImGui::TextUnformatted(title.c_str());
 }
 
-constexpr const char* kCredit = "Port by Rangga Casper";
+constexpr const char* kCredit = "Port by Katon Bagaskoro";
 
 // the hint line, then the credit on the left and Back and Defaults on the right
 void DrawFooter(float em) {
