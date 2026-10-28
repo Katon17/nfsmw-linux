@@ -1,0 +1,48 @@
+#!/bin/bash
+# nfsmw-linux: starts Need for Speed: Most Wanted Black Edition (native Linux build).
+# If the game has not been built yet, it automatically opens a file chooser to let you select your ISO.
+#
+# Usage:
+#   nfsmw-linux [--windowed] [--borderless] [--fullscreen] [--rebuild] [--change-iso]
+set -euo pipefail
+
+DATA="${NFSMW_DATA_DIR:-/usr/share/nfsmw-linux}"
+LIB="${NFSMW_LIB_DIR:-/usr/lib/nfsmw-linux}"
+HOME_DIR="${NFSMW_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/nfsmw-linux}"
+VERSION="@VERSION@"
+
+export NFSMW_DATA_DIR="$DATA"
+export NFSMW_LIB_DIR="$LIB"
+export NFSMW_HOME="$HOME_DIR"
+
+REBUILD=0
+CHANGE_ISO=0
+ARGS=()
+for a in "$@"; do
+    case "$a" in
+        --windowed) export NFSMW_WINDOWED=1 ;;
+        --borderless) export NFSMW_BORDERLESS=1 ;;
+        --fullscreen) export NFSMW_FULLSCREEN=1 ;;
+        --rebuild) REBUILD=1 ;;
+        --change-iso) CHANGE_ISO=1 ;;
+        *) ARGS+=("$a") ;;
+    esac
+done
+
+stamp_version=$(cut -d' ' -f1 "$HOME_DIR/bin/.stamp" 2>/dev/null || true)
+if [[ $REBUILD == 1 || $CHANGE_ISO == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then
+    GUI_FLAG=""
+    command -v zenity >/dev/null 2>&1 && GUI_FLAG="--gui"
+    nfsmw-linux-build $GUI_FLAG $([[ $REBUILD == 1 || $CHANGE_ISO == 1 ]] && echo --force) || exit 1
+fi
+
+if [[ ! -x $HOME_DIR/bin/MOSTWANTED ]]; then
+    exit 0
+fi
+
+# Intel HD Graphics / Mesa: keep Vulkan pipeline cache isolated
+export MESA_SHADER_CACHE_DIR="${MESA_SHADER_CACHE_DIR:-$HOME_DIR/mesa_cache}"
+mkdir -p "$MESA_SHADER_CACHE_DIR"
+
+cd "$HOME_DIR" || exit 1
+exec "$HOME_DIR/bin/MOSTWANTED" "${ARGS[@]}"
