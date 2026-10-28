@@ -162,6 +162,7 @@ while true; do
     KEY=$( { sha1sum "$LIB/xbe_recomp" "$DATA/config/game.toml"; find "$DATA/sdk" -type f \( -name '*.h' -o -name '*.toml' \) | sort | xargs sha1sum; echo "$FLAGS $IMAGE_SHA $($CXX --version | head -n1)"; } | sha1sum | cut -c1-12)
     GEN="$WORK/gen-$KEY"
     OBJ="$WORK/obj-$KEY"
+    mkdir -p "$GEN" "$OBJ"
 
     say "[1/3] Menjalankan recompiler Xbox XBE ke C++ ..."
     if ! "$LIB/xbe_recomp" "$DATA/config/game.toml" "$XBE" "$GEN" --xdk "$DATA/sdk/xdk" >>"$LOG" 2>&1; then
@@ -200,8 +201,11 @@ done
 
 # ------------------------------------------------------------------ Step 2: Compile
 say "[2/3] Mengompilasi modul C++ game untuk prosesor PC Anda..."
+mkdir -p "$OBJ"
 SOURCES=("$GEN"/x86_func_mapping.cpp "$GEN"/x86_recomp.*.cpp)
 TOTAL=${#SOURCES[@]}
+(( TOTAL > 0 )) || fail "Tidak ada file sumber C++ yang dihasilkan di $GEN"
+
 if [[ -z $JOBS ]]; then
     MEM_GB=$(awk '/MemAvailable/ {printf "%d", $2/1048576}' /proc/meminfo)
     JOBS=$(( (MEM_GB - 1) / 2 ))
@@ -209,14 +213,13 @@ if [[ -z $JOBS ]]; then
     (( JOBS > $(nproc) )) && JOBS=$(nproc)
 fi
 
-DONE=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l)
+DONE=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l || echo 0)
 if (( DONE >= TOTAL )); then
     say "Semua $TOTAL modul telah dikompilasi sebelumnya: langsung ke tahap link."
 else
     say "Mengompilasi $TOTAL modul dengan $JOBS proses paralel (hanya berjalan 1 kali saat pertama)..."
 fi
 
-mkdir -p "$OBJ"
 export CXX MARCH GEN OBJ DATA LOG FLAGS
 compile_one() {
     local src="$1" o
@@ -230,8 +233,10 @@ export -f compile_one
 progress() {
     local done=0
     while (( done < TOTAL )); do
-        done=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l)
-        echo $(( done * 100 / TOTAL ))
+        done=$(find "$OBJ" -name '*.o' 2>/dev/null | wc -l || echo 0)
+        local pct=0
+        (( TOTAL > 0 )) && pct=$(( done * 100 / TOTAL ))
+        echo "$pct"
         echo "# Mengompilasi NFSMW: $done / $TOTAL modul selesai..."
         sleep 2
         kill -0 "$1" 2>/dev/null || break
