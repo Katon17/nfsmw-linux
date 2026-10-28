@@ -306,6 +306,34 @@ chmod 755 "$HOME_DIR/bin/MOSTWANTED"
 STAMP="$VERSION $IMAGE_SHA"
 echo "$STAMP" > "$HOME_DIR/bin/.stamp"
 
+# Initialize clean default WASD keyboard bindings if not already customized
+CONF="$HOME_DIR/mostwanted.toml"
+if ! grep -q "\[keys\]" "$CONF" 2>/dev/null; then
+    cat <<'EOF' >> "$CONF"
+
+[keys]
+trigger_right = "W"
+trigger_left = "S"
+move_left = "A"
+move_right = "D"
+move_up = ""
+move_down = ""
+button_a = "Space,Enter"
+button_b = "Shift"
+button_x = "X"
+button_y = "C"
+button_black = "V"
+button_white = "H"
+dpad_up = "Up"
+dpad_down = "Down"
+dpad_left = "Left"
+dpad_right = "Right"
+start = "Escape"
+back = "R"
+settings_panel = "F10,Backtick"
+EOF
+fi
+
 say ""
 say "======================================================================"
 say "  BERHASIL! Binary native telah dibuat di:"
