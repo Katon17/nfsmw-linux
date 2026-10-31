@@ -17,9 +17,9 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 
 ## 📸 Screenshots
 
-| New Settings Icon | General & Credits Menu (104 FPS) |
+| New Settings Icon | General Menu, Credits, and Exit Game |
 |:---:|:---:|
-| ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Credits 104 FPS](screenshots/general_credits_104fps.png) |
+| ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Menu, Credits, and Exit Game](screenshots/general_menu_credits_exit.png) |
 
 | Gameplay Prologue Race (Locked 61 FPS) | Lenovo ThinkPad X270 Hardware Specs |
 |:---:|:---:|

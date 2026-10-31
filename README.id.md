@@ -17,9 +17,9 @@ Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need f
 
 ## 📸 Tangkapan Layar
 
-| New Settings Icon | Menu General & Credits (104 FPS) |
+| New Settings Icon | General Menu, Credits, and Exit Game |
 |:---:|:---:|
-| ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Credits 104 FPS](screenshots/general_credits_104fps.png) |
+| ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Menu, Credits, and Exit Game](screenshots/general_menu_credits_exit.png) |
 
 | Gameplay Balapan Prolog (Terkunci 61 FPS) | Spesifikasi Perangkat Lenovo ThinkPad X270 |
 |:---:|:---:|
