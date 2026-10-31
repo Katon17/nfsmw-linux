@@ -9,22 +9,22 @@ struct Action {
     const char* defaults;
 };
 
-const Action* PadActions(size_t* count) {
+__attribute__((weak)) const Action* PadActions(size_t* count) {
     if (count) *count = 0;
     return nullptr;
 }
 
-std::string PadBinding(size_t) {
+__attribute__((weak)) std::string PadBinding(size_t) {
     return "";
 }
 
-void PadBind(size_t, const std::string&) {}
+__attribute__((weak)) void PadBind(size_t, const std::string&) {}
 
-void ResetPadBindings() {}
+__attribute__((weak)) void ResetPadBindings() {}
 
-void LoadPadBindings() {}
+__attribute__((weak)) void LoadPadBindings() {}
 
-std::string PressedPadInput() {
+__attribute__((weak)) std::string PressedPadInput() {
     return "";
 }
 
@@ -32,26 +32,27 @@ std::string PressedPadInput() {
 
 namespace host {
 
-void SamplePerf() {}
+__attribute__((weak)) void SamplePerf() {}
 
-float CpuLoad() {
+__attribute__((weak)) float CpuLoad() {
     return -1.0f;
 }
 
-float GpuLoad() {
+__attribute__((weak)) float GpuLoad() {
     return -1.0f;
 }
 
-float CpuTemp() {
+__attribute__((weak)) float CpuTemp() {
     return -1.0f;
 }
 
-float GpuTemp() {
+__attribute__((weak)) float GpuTemp() {
     return -1.0f;
 }
 
-float BatteryTemp() {
+__attribute__((weak)) float BatteryTemp() {
     return -1.0f;
 }
 
 }  // namespace host
+

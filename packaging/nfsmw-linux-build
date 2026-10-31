@@ -266,41 +266,38 @@ say "[3/3] Melakukan linking binary Linux native (MOSTWANTED)..."
 echo "extern const char kImageSha1[] = \"$IMAGE_SHA\";" > "$WORK/image_sha1.cpp"
 $CXX $FLAGS -c "$WORK/image_sha1.cpp" -o "$WORK/image_sha1.o" 2>>"$LOG" || fail "see $LOG"
 
-EXTRA_STUBS=()
-if ! nm "$LIB/libnfsmw_host.a" 2>/dev/null | grep -q "PadActions"; then
-    cat <<'EOF' > "$WORK/host_stubs.cpp"
+cat <<'EOF' > "$WORK/host_stubs.cpp"
 #include <cstddef>
 #include <string>
 
 namespace input {
 struct Action { const char* id; const char* label; const char* defaults; };
-const Action* PadActions(size_t* count) { if (count) *count = 0; return nullptr; }
-std::string PadBinding(size_t) { return ""; }
-void PadBind(size_t, const std::string&) {}
-void ResetPadBindings() {}
-void LoadPadBindings() {}
-std::string PressedPadInput() { return ""; }
+__attribute__((weak)) const Action* PadActions(size_t* count) { if (count) *count = 0; return nullptr; }
+__attribute__((weak)) std::string PadBinding(size_t) { return ""; }
+__attribute__((weak)) void PadBind(size_t, const std::string&) {}
+__attribute__((weak)) void ResetPadBindings() {}
+__attribute__((weak)) void LoadPadBindings() {}
+__attribute__((weak)) std::string PressedPadInput() { return ""; }
 }
 
 namespace host {
-void SamplePerf() {}
-float CpuLoad() { return -1.0f; }
-float GpuLoad() { return -1.0f; }
-float CpuTemp() { return -1.0f; }
-float GpuTemp() { return -1.0f; }
-float BatteryTemp() { return -1.0f; }
+__attribute__((weak)) void SamplePerf() {}
+__attribute__((weak)) float CpuLoad() { return -1.0f; }
+__attribute__((weak)) float GpuLoad() { return -1.0f; }
+__attribute__((weak)) float CpuTemp() { return -1.0f; }
+__attribute__((weak)) float GpuTemp() { return -1.0f; }
+__attribute__((weak)) float BatteryTemp() { return -1.0f; }
 }
 EOF
-    $CXX $FLAGS -c "$WORK/host_stubs.cpp" -o "$WORK/host_stubs.o" 2>>"$LOG" || fail "see $LOG"
-    EXTRA_STUBS+=("$WORK/host_stubs.o")
-fi
+$CXX $FLAGS -c "$WORK/host_stubs.cpp" -o "$WORK/host_stubs.o" 2>>"$LOG" || fail "see $LOG"
 
 OBJS=("$OBJ"/x86_func_mapping.o)
 for s in "${SOURCES[@]:1}"; do
     OBJS+=("$OBJ/$(basename "$s" .cpp).o")
 done
 
-$CXX -fuse-ld=lld -o "$HOME_DIR/bin/MOSTWANTED.new" "${OBJS[@]}" "$WORK/image_sha1.o" "${EXTRA_STUBS[@]}" \
+$CXX -fuse-ld=lld -Wl,--allow-multiple-definition -o "$HOME_DIR/bin/MOSTWANTED.new" \
+    "${OBJS[@]}" "$WORK/image_sha1.o" "$WORK/host_stubs.o" \
     -Wl,--whole-archive "$LIB/libnfsmw_host.a" -Wl,--no-whole-archive \
     -Wl,--start-group $(grep '\.a$' "$LIB/link-libs.txt" 2>/dev/null | sed "s|^|$LIB/|") -Wl,--end-group \
     "$VK" -lpthread -ldl -lm -lrt >>"$LOG" 2>&1 || fail "Linking gagal. Cek log: $LOG"
