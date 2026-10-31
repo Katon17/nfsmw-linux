@@ -93,6 +93,8 @@ constexpr Entry kEntries[] = {
     {"XBOX REFERENCES", {u"Références Xbox", u"Xbox-Referenzen", u"Riferimenti Xbox", u"Referencias de Xbox", u"Referensi Xbox"}},
     {"SUPPORT", {u"Soutenir", u"Unterstützen", u"Supporta", u"Apoyar", u"Dukungan"}},
     {"DONATE", {u"Faire un don", u"Spenden", u"Dona", u"Donar", u"Donasi"}},
+    {"QUIT", {u"Quitter", u"Beenden", u"Esci", u"Salir", u"Keluar"}},
+    {"EXIT GAME", {u"Quitter le jeu", u"Spiel beenden", u"Esci dal gioco", u"Salir del juego", u"Keluar Game"}},
 
     // their values
     {"FULLSCREEN", {u"Plein écran", u"Vollbild", u"Schermo intero", u"Pantalla completa", u"Layar penuh"}},

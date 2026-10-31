@@ -25,6 +25,7 @@
 #include "common/options.h"
 #include "common/pad_binds.h"
 #include "common/translations.h"
+#include "kernel/kernel.h"
 
 // native/gyro.cpp: steering by tilting the phone
 namespace gyro {
@@ -106,9 +107,9 @@ constexpr uint32_t kAudioOutputs[] = {audio::kOutputAuto, audio::kOutputMono, au
 const char* const kAudioOutputNames[] = {"AUTOMATIC", "MONO", "2.0 STEREO", "5.1 SURROUND"};
 const char* const kLanguageNames[] = {"ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "SPANISH",
                                       "INDONESIAN"};  // as game::kLanguages
-constexpr const char* kDonateUrl = "https://sociabuzz.com/racas/tribe";
-constexpr const char* kGithubUrl = "https://github.com/RanggaCasper";
-constexpr const char* kYoutubeUrl = "https://youtube.com/c/@RanggaCasper";
+constexpr const char* kDonateUrl = "https://saweria.co/Kabako";
+constexpr const char* kGithubUrl = "https://github.com/Katon17/nfsmw-linux";
+constexpr const char* kYoutubeUrl = "https://www.youtube.com/@KabakoNT";
 constexpr uint32_t kFpsCaps[] = {30, 60, 75, 90, 120, 144, 165, 240, 360, kFpsCapRefresh, 0};
 
 int StepIndex(int index, int step, int count) {
@@ -247,7 +248,7 @@ enum RowId { kRenderResolution, kMaxFps, kVsync, kFpsCounter, kAniso, kAudioOutp
              kAntiAliasing, kFpsPosition, kFpsTemps, kStickMode, kBloom, kFog, kDonate, kGithub, kYoutube, kFpsUsage,
              kReflections, kParticles, kRain, kRainDrops, kShadows, kRoadReflections,
              kCheatNos, kCheatSpeedbreaker, kCheatCash, kCheatNoPolice, kCheatUnlockAll,
-             kSkipMovies };
+             kSkipMovies, kExitGame };
 
 using rows::Kind;
 using rows::Row;
@@ -322,6 +323,8 @@ constexpr Row kCreditRows[] = {
     {Kind::Link, kDonate, "DONATE"},
     {Kind::Link, kGithub, "GITHUB"},
     {Kind::Link, kYoutube, "YOUTUBE"},
+    {Kind::Heading, -1, "QUIT"},
+    {Kind::Link, kExitGame, "EXIT GAME"},
 };
 
 const std::vector<Row>& InputRows() {
@@ -667,7 +670,7 @@ void LinkRow(const Row& r) {
     bool open = ImGui::Selectable("##link", false, ImGuiSelectableFlags_AllowOverlap, ImVec2(box.row_w, box.row_h));
     if (ImGui::IsItemFocused() || ImGui::IsItemHovered()) FillItem();
     RowLabel(box, r.label);
-    std::string value = Ui("OPEN");
+    std::string value = Ui(r.id == kExitGame ? "QUIT" : (r.id == kTouchEdit ? "EDIT" : "OPEN"));
     float value_x = box.row_x + box.row_w - box.block_w + box.row_h + ImGui::GetStyle().ItemSpacing.x;
     float pad = (box.value_w - ImGui::CalcTextSize(value.c_str()).x) * 0.5f;
     ImGui::SetCursorPos(ImVec2(value_x + std::max(pad, 0.0f), box.row_y));
@@ -679,6 +682,13 @@ void LinkRow(const Row& r) {
     EndRow(box);
     if (!open) return;
     if (r.id == kTouchEdit) touch::EditLayout();
+    else if (r.id == kExitGame) {
+        SDL_Event ev = {};
+        ev.type = SDL_EVENT_QUIT;
+        SDL_PushEvent(&ev);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        kernel::Shutdown(0);
+    }
     else if (const char* url = LinkUrl(r.id)) SDL_OpenURL(url);
 }
 
@@ -903,7 +913,7 @@ std::string rows::Value(const Row& r, int step) {
         case Kind::Value:
             return Ui(RowText(r.id, step));
         case Kind::Link:
-            return Ui("OPEN");
+            return Ui(r.id == kExitGame ? "QUIT" : "OPEN");
         case Kind::Info:
             return r.id >= 0 && r.id < int(std::size(kCreditNames)) ? kCreditNames[r.id] : "";
         case Kind::Bind: {
@@ -926,6 +936,13 @@ std::string rows::Value(const Row& r, int step) {
 void rows::Activate(const Row& r) {
     if (r.kind == Kind::Link) {
         if (r.id == kTouchEdit) touch::EditLayout();
+        else if (r.id == kExitGame) {
+            SDL_Event ev = {};
+            ev.type = SDL_EVENT_QUIT;
+            SDL_PushEvent(&ev);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            kernel::Shutdown(0);
+        }
         else if (const char* url = LinkUrl(r.id)) SDL_OpenURL(url);
     } else if (r.kind == Kind::Bind && g_capture < 0 && g_pad_capture < 0) {
         g_capture_slot = 0;
