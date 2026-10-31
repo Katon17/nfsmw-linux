@@ -266,7 +266,9 @@ say "[3/3] Melakukan linking binary Linux native (MOSTWANTED)..."
 echo "extern const char kImageSha1[] = \"$IMAGE_SHA\";" > "$WORK/image_sha1.cpp"
 $CXX $FLAGS -c "$WORK/image_sha1.cpp" -o "$WORK/image_sha1.o" 2>>"$LOG" || fail "see $LOG"
 
-cat <<'EOF' > "$WORK/host_stubs.cpp"
+EXTRA_STUBS=()
+if ! nm "$LIB/libnfsmw_host.a" 2>/dev/null | grep -q "PadActions"; then
+    cat <<'EOF' > "$WORK/host_stubs.cpp"
 #include <cstddef>
 #include <string>
 
@@ -289,16 +291,18 @@ float GpuTemp() { return -1.0f; }
 float BatteryTemp() { return -1.0f; }
 }
 EOF
-$CXX $FLAGS -c "$WORK/host_stubs.cpp" -o "$WORK/host_stubs.o" 2>>"$LOG" || fail "see $LOG"
+    $CXX $FLAGS -c "$WORK/host_stubs.cpp" -o "$WORK/host_stubs.o" 2>>"$LOG" || fail "see $LOG"
+    EXTRA_STUBS+=("$WORK/host_stubs.o")
+fi
 
 OBJS=("$OBJ"/x86_func_mapping.o)
 for s in "${SOURCES[@]:1}"; do
     OBJS+=("$OBJ/$(basename "$s" .cpp).o")
 done
 
-$CXX -fuse-ld=lld -o "$HOME_DIR/bin/MOSTWANTED.new" "${OBJS[@]}" "$WORK/image_sha1.o" "$WORK/host_stubs.o" \
+$CXX -fuse-ld=lld -o "$HOME_DIR/bin/MOSTWANTED.new" "${OBJS[@]}" "$WORK/image_sha1.o" "${EXTRA_STUBS[@]}" \
     -Wl,--whole-archive "$LIB/libnfsmw_host.a" -Wl,--no-whole-archive \
-    -Wl,--start-group $(cat "$LIB/link-libs.txt" | sed "s|^|$LIB/|") -Wl,--end-group \
+    -Wl,--start-group $(grep '\.a$' "$LIB/link-libs.txt" 2>/dev/null | sed "s|^|$LIB/|") -Wl,--end-group \
     "$VK" -lpthread -ldl -lm -lrt >>"$LOG" 2>&1 || fail "Linking gagal. Cek log: $LOG"
 
 mv -f "$HOME_DIR/bin/MOSTWANTED.new" "$HOME_DIR/bin/MOSTWANTED"

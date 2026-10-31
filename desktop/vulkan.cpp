@@ -1960,12 +1960,13 @@ VkFence VulkanBackend::SubmitFence(uint64_t value) {
 
 void VulkanBackend::WaitValue(uint64_t v) {
     if (!v || Completed() >= v) return;
+    constexpr uint64_t kGpuWaitTimeoutNs = 5'000'000'000ull;  // 5s timeout prevents infinite loading hangs
     if (!timeline_ok_) {
         // the lock is held through the wait so no fence is reset under it; the GPU needs no thread to get there
         std::lock_guard lock(fence_lock_);
         for (const Pending& p : pending_)
             if (p.value >= v) {
-                vkWaitForFences(dev_, 1, &p.fence, VK_TRUE, UINT64_MAX);
+                vkWaitForFences(dev_, 1, &p.fence, VK_TRUE, kGpuWaitTimeoutNs);
                 break;
             }
         PollFences();
@@ -1975,7 +1976,7 @@ void VulkanBackend::WaitValue(uint64_t v) {
     wi.semaphoreCount = 1;
     wi.pSemaphores = &timeline_;
     wi.pValues = &v;
-    wait_semaphores_(dev_, &wi, UINT64_MAX);
+    wait_semaphores_(dev_, &wi, kGpuWaitTimeoutNs);
 }
 
 // the frame's garbage freed and its pools reset, once the GPU is past it
@@ -3443,7 +3444,7 @@ void VulkanBackend::Sync(uint32_t data, uint32_t) {
     Image* src = CopySource(t, down);
     std::vector<uint8_t> px;
     bool ok = src && ReadBack(*src, t.gw, t.gh, px);
-    Destroy(down);  // ReadBack waited for the GPU
+    Retire(down);  // kept until its recorded use has safely finished
     if (!ok) return;
     uint32_t pitch = GuestPitch(t.gw);
     uint8_t* guest = static_cast<uint8_t*>(kernel::HostPtr(data));

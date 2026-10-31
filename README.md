@@ -139,7 +139,34 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.0_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.1_amd64.deb`.
+
+---
+
+## 🔧 Troubleshooting & Solusi Masalah Populer
+
+### 1. Linking Gagal pada Step `[3/3]` (`undefined symbol: PadActions / SamplePerf`)
+* **Penyebab**: Paket rilis versi lama (v0.1.0) belum mem-bake stub input ke dalam `libnfsmw_host.a`.
+* **Solusi di v0.1.1**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan fail-safe runtime fallback. Cukup install update:
+  ```bash
+  sudo dpkg -i nfsmw-linux_0.1.1_amd64.deb
+  nfsmw-linux --rebuild
+  ```
+
+### 2. Freeze / Stuck Loading setelah Mengalahkan SLR McLaren Hitam (Prologue Race 2)
+* **Penyebab**: 
+  1. Vulkan Fence deadlock (`UINT64_MAX` menunggu GPU tak terhingga saat transisi FMV/cutscene ke race berikutnya).
+  2. Partisi cache sementara Xbox (`hdd/X`, `hdd/Y`, `hdd/Z`) menyimpan dump sementara yang korup saat transisi loading.
+  3. Pemutaran FMV transisi tidak merespons tombol lewati (*skip*).
+* **Solusi di v0.1.1**:
+  - Vulkan fence timeout dibatasi maksimal 5 detik (`kGpuWaitTimeoutNs`) untuk mencegah GPU hang tanpa henti.
+  - Penanganan transfer image Vulkan di-upgrade ke `Retire(down)` agar tekstur in-flight tidak terhapus prematur.
+  - Cutscene transisi kini dapat dilewati secara manual kapan saja dengan menekan **Enter** atau **Spacebar** / Gamepad **A**.
+  - Partisi scratch cache Xbox (`X`, `Y`, `Z`) dibersihkan otomatis pada setiap boot game tanpa menyentuh progress save karier (`hdd/E/UDATA`).
+  - Pembersihan cache shader manual dapat dijalankan dengan:
+    ```bash
+    nfsmw-linux --clean-cache
+    ```
 
 ---
 

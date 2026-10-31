@@ -17,6 +17,7 @@ export NFSMW_HOME="$HOME_DIR"
 
 REBUILD=0
 CHANGE_ISO=0
+CLEAN_CACHE=0
 ARGS=()
 for a in "$@"; do
     case "$a" in
@@ -25,9 +26,20 @@ for a in "$@"; do
         --fullscreen) export NFSMW_FULLSCREEN=1 ;;
         --rebuild) REBUILD=1 ;;
         --change-iso) CHANGE_ISO=1 ;;
+        --clean-cache) CLEAN_CACHE=1 ;;
         *) ARGS+=("$a") ;;
     esac
 done
+
+# Clean temporary Xbox scratch cache partitions (X, Y, Z) on every launch, exactly
+# as real Xbox hardware does on reboot. User career progress in E/UDATA is preserved.
+rm -rf "$HOME_DIR/hdd/X"/* "$HOME_DIR/hdd/Y"/* "$HOME_DIR/hdd/Z"/* 2>/dev/null || true
+mkdir -p "$HOME_DIR/hdd/X" "$HOME_DIR/hdd/Y" "$HOME_DIR/hdd/Z" "$HOME_DIR/hdd/E/UDATA" "$HOME_DIR/hdd/E/TDATA"
+
+if [[ $CLEAN_CACHE == 1 ]]; then
+    echo "nfsmw-linux: Membersihkan temporary shader cache..."
+    rm -rf "$HOME_DIR/mesa_cache"/* 2>/dev/null || true
+fi
 
 stamp_version=$(cut -d' ' -f1 "$HOME_DIR/bin/.stamp" 2>/dev/null || true)
 if [[ $REBUILD == 1 || $CHANGE_ISO == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then

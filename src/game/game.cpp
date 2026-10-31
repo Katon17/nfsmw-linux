@@ -128,13 +128,14 @@ std::unordered_map<uint32_t, int> g_movie_ticks;  // a movie screen's ticks so f
 void SkipMovie(X86Context& ctx, uint32_t allow_flag) {
     uint32_t message = kernel::R32(ctx.esp + 4);
     bool press = message == kMsgPadAccept || message == kMsgPadStart;
-    if (!Opt().skip_movies || (!press && message != kMsgTick)) return;
+    if (!Opt().skip_movies && !press) return;
     int& ticks = g_movie_ticks[ctx.ecx];
     if (press) {
         if (ticks > kSkipTick) kernel::W32(ctx.esp + 4, kMsgTick);  // ended already
         else if (!allow_flag || kernel::G<uint8_t>(ctx.ecx + allow_flag)) ticks = kSkipTick + 1;  // the player's ends it
         return;
     }
+    if (!Opt().skip_movies) return;
     if (ticks > kSkipTick || ++ticks < kSkipTick) return;
     if (allow_flag && !kernel::G<uint8_t>(ctx.ecx + allow_flag)) {
         ticks = kSkipTick - 1;  // not yet: the next tick asks again
