@@ -13,6 +13,16 @@ fi
 git config user.name "Katon Bagaskoro"
 git config user.email "katon@thinkpad.local"
 
+if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+    echo "Creating initial commit..."
+    git add .
+    git commit -m "feat: initial release v0.1.4 of Need for Speed: Most Wanted (Black Edition) native Linux port"
+elif [[ -n $(git status --porcelain) ]]; then
+    echo "Committing pending changes..."
+    git add .
+    git commit -m "update: latest fixes and enhancements v0.1.4"
+fi
+
 if git remote | grep -q origin; then
     git remote set-url origin "$REPO_URL"
 else
