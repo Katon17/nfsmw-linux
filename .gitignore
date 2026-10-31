@@ -1,0 +1,35 @@
+# Build and binary artifacts
+build/
+release/
+*.o
+*.a
+*.so
+*.dylib
+*.deb
+*.new
+MOSTWANTED
+xbe_recomp
+xbe_symbols
+
+# User-specific runtime data and cache
+hdd/
+logs/
+mesa_cache/
+.stamp
+.cache/
+
+# Proprietary assets (must NEVER be committed)
+assets/*.xbe
+assets/*.XBE
+assets/*.iso
+assets/*.ISO
+default.xbe
+DEFAULT.XBE
+
+# IDE and temporary files
+.vscode/
+.idea/
+*~
+*.swp
+*.bak
+.DS_Store
