@@ -223,8 +223,13 @@ If this project is useful to you and the Linux gaming community, you can support
 
 ---
 
-## 📜 Credits & Acknowledgements
+## ⚖️ License
 
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** — see [LICENSE](LICENSE). You are free to use, modify, and distribute it, provided derivative works remain open-source under the same license.
+
+---
+
+## 📜 Credits & Acknowledgements
 * **Linux Desktop Maintainer**: [Katon Bagaskoro (@Katon17)](https://github.com/Katon17)
 * **Upstream Android Host Runtime**: [RanggaCasper/MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android)
 * **Xbox Static Recompiler**: [TGP482/XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp)

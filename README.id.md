@@ -223,6 +223,12 @@ Jika proyek ini bermanfaat bagi Anda dan komunitas Linux gaming, Anda dapat mend
 
 ---
 
+## ⚖️ Lisensi
+
+Proyek ini dilisensikan di bawah **GNU General Public License v3.0 (GPL-3.0)** — lihat [LICENSE](LICENSE). Kamu bebas menggunakan, memodifikasi, dan mendistribusikannya, dengan syarat karya turunan tetap open-source di bawah lisensi yang sama.
+
+---
+
 ## 📜 Kredit & Pengakuan
 
 * **Maintainer Desktop Linux**: [Katon Bagaskoro (@Katon17)](https://github.com/Katon17)
