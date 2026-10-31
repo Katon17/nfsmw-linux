@@ -1,0 +1,60 @@
+nfsmw-linux: Native Linux Port of Need for Speed: Most Wanted (Black Edition)
+=============================================================================
+
+This package provides a native Linux desktop application (x86_64 ELF)
+for original Xbox "Need for Speed: Most Wanted (Black Edition)" (2005).
+
+Unlike emulators (Xemu, RPCS3) or Windows compatibility layers (Wine/Proton),
+this port uses static recompilation (XboxXBE-Recomp) combined with an optimized
+native SDL3 + Vulkan Linux desktop runtime.
+
+Hardware Requirements:
+----------------------
+• Target Hardware: Any 64-bit x86 CPU (tested on Lenovo ThinkPad X270 with Intel HD 620).
+• Memory: 4 GB RAM minimum (8 GB recommended for parallel recompilation).
+• Graphics: Any Vulkan 1.1 compatible GPU (Intel ANV, AMD RADV, NVIDIA).
+• Operating System: Ubuntu 24.04 LTS / Linux Mint 22.x or any modern Linux distribution.
+
+First-Time Setup:
+-----------------
+This package does NOT include proprietary game code or EA copyrighted assets.
+You provide your own copy of Need for Speed: Most Wanted Black Edition for Xbox:
+1. Place your Xbox disc image (.iso) or extracted game folder into:
+     ~/.local/share/nfsmw-linux/game/
+   or pass it directly to the build tool.
+2. Run:
+     nfsmw-linux-build
+   (or simply launch "Need for Speed: Most Wanted" from your application menu).
+3. The build tool extracts default.xbe, translates machine code to native C++,
+   compiles, and links the executable directly against the optimized host library.
+
+Game Directory Structure:
+-------------------------
+~/.local/share/nfsmw-linux/
+├── bin/
+│   └── MOSTWANTED          (The compiled native game binary)
+├── game/                   (Your ISO or extracted assets)
+├── hdd/                    (Xbox virtual hard drive: save games & profiles)
+├── logs/                   (Runtime diagnostic logs)
+├── mesa_cache/             (Pre-compiled Vulkan pipeline cache)
+└── settings.toml           (Graphics, audio, and controller settings)
+
+Controls:
+---------
+• Keyboard & Mouse:
+  - Accelerate: W / Up Arrow
+  - Brake / Reverse: S / Down Arrow
+  - Steering: A / D or Left / Right Arrows
+  - Handbrake: Spacebar
+  - Nitrous (NOS): Left Shift or Right Shift
+  - SpeedBreaker: Left Alt / Keypad 0
+  - Look Back: C / Middle Mouse Button
+  - Pause Menu: Esc / Enter
+• Gamepads:
+  - Full native hot-plug support for Xbox, DualShock/DualSense, and generic controllers
+  - Right Trigger: Throttle
+  - Left Trigger: Brake
+  - Left Stick: Steering
+  - A / Cross: Handbrake
+  - X / Square: Nitrous
+  - B / Circle: SpeedBreaker
