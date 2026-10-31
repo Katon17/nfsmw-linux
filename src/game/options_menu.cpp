@@ -116,7 +116,7 @@ struct Section {
     std::vector<int> pages;
 };
 // the last is the menu that holds them, the main menu's icon
-const Section kSections[] = {{"GRAPHICS", {0}}, {"CONTROLS", {1, 3, 4}}, {"GENERAL", {2, 5}}, {"ANDROID OPTIONS", {}}};
+const Section kSections[] = {{"GRAPHICS", {0}}, {"CONTROLS", {1, 3, 4}}, {"GENERAL", {2, 5}}, {"LINUX OPTIONS", {}}};
 constexpr int kSectionCount = int(std::size(kSections));
 constexpr int kAndroidSection = kSectionCount - 1;
 static_assert(kSectionCount <= kIconCount, "tools/option_icons.py draws an icon a section");
