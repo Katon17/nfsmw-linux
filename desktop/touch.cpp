@@ -82,6 +82,8 @@ constexpr int kStickMax = 32767;
 // - Look Back: C or L (Button Y)
 // - Camera View: V (Black Button)
 // - Horn: H (White Button)
+// - Shift Up (Manual / Drag Race): Page Up or Numpad 8 (Right Stick Up)
+// - Shift Down (Manual / Drag Race): Page Down or Numpad 5 (Right Stick Down)
 // - Pause: Escape (Start)
 // - Reset Car / GPS Map: R or Tab (Back)
 // - Event / Safehouse: Enter or Up (D-Pad Up)
@@ -107,8 +109,8 @@ constexpr Target kActions[] = {
     {{"thumb_left", "LEFT THUMB", "Z"}, 14},
     {{"thumb_right", "RIGHT THUMB", "Numpad0"}, 15},
     {{"settings_panel", "SETTINGS PANEL", "F10,Backtick"}, kHostKey},
-    {{"look_up", "LOOK UP", "Numpad8"}, 20},
-    {{"look_down", "LOOK DOWN", "Numpad5"}, 21},
+    {{"look_up", "SHIFT UP / LOOK UP", "PageUp,Numpad8"}, 20},
+    {{"look_down", "SHIFT DOWN / LOOK DOWN", "PageDown,Numpad5"}, 21},
     {{"look_left", "LOOK LEFT", "Numpad4"}, 22},
     {{"look_right", "LOOK RIGHT", "Numpad6"}, 23},
 };

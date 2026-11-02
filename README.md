@@ -135,6 +135,8 @@ The controls are pre-configured out-of-the-box to match the canonical PC Need fo
 | **Steer Left** | `A` | Turn wheels left (Analog stick) |
 | **Steer Right** | `D` | Turn wheels right (Analog stick) |
 | **Handbrake / Drift** | `Spacebar` | E-brake for power slides and tight hairpins |
+| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi pada mode Drag Race (Right Stick Up) |
+| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi pada mode Drag Race (Right Stick Down) |
 | **Nitrous (NOS)** | `Left Shift` | Nitrous oxide boost |
 | **Speedbreaker** | `X` | Bullet-time slow motion |
 | **Look Back (Rear View)** | `C` | Look behind car |
@@ -151,6 +153,8 @@ Plug-and-play controller support via SDL3:
 - **Gas / Accelerate**: Right Trigger (`RT` / `R2`)
 - **Brake / Reverse**: Left Trigger (`LT` / `L2`)
 - **Steer**: Left Analog Stick
+- **Shift Up (Drag / Manual)**: Right Analog Stick Up
+- **Shift Down (Drag / Manual)**: Right Analog Stick Down
 - **Handbrake**: `A` (Xbox) / `Cross` (PlayStation)
 - **Nitrous**: `B` (Xbox) / `Circle` (PlayStation)
 - **Speedbreaker**: `X` (Xbox) / `Square` (PlayStation)
