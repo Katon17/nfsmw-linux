@@ -1,6 +1,6 @@
 # Need for Speed: Most Wanted (Black Edition) — Native Linux Port
 
-[![Release: v0.1.4](https://img.shields.io/badge/Release-v0.1.4-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.5](https://img.shields.io/badge/Release-v0.1.5-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -41,7 +41,17 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.4 (Latest)
+### Version 0.1.5 (Latest)
+- **Oper Gigi Drag Race Langsung Bekerja (Out-of-the-Box Drag Shifting)**:
+  - Tombol oper gigi (Naik Gigi / Turun Gigi) kini di-mapping langsung ke **Page Up** (`PgUp`) dan **Page Down** (`PgDn`) (serta Numpad 8 dan Numpad 5).
+  - Pengguna laptop tanpa keypad Numpad fisik (seperti Lenovo ThinkPad X270) langsung dapat bermain mode Drag Race dan mengoper gigi tanpa perlu repot konfigurasi manual.
+- **Perbaikan Bentrok Tombol Enter / Accept saat Mengatur Kontrol In-Game**:
+  - Mengatasi masalah di mana tombol `Enter` bentrok antara fungsi navigasi `Accept / OK` menu dan perekaman tombol baru (*Key Capture*).
+  - Mengisolasi input stik controller selama proses perekaman tombol berlangsung (`app::Capturing()`), sehingga pemain dapat mengganti tombol apa pun langsung dari menu game secara mulus tanpa terpotong atau tertutup otomatis.
+- **Penyempurnaan Label Menu Kontrol**:
+  - Mengubah label menu di bagian Kontrol dari yang sebelumnya hanya *"Look Up"* dan *"Look Down"* menjadi: **"SHIFT UP / LOOK UP"** dan **"SHIFT DOWN / LOOK DOWN"**.
+
+### Version 0.1.4
 - **Tautan Resmi Pengembang (Support & Media)**:
   - Menu **General > SUPPORT** kini langsung terhubung ke profil resmi [Katon Bagaskoro](https://github.com/Katon17):
     - **DONATE**: [Saweria (saweria.co/Kabako)](https://saweria.co/Kabako)

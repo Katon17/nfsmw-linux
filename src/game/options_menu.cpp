@@ -824,6 +824,10 @@ X86_FUNC(sub_00153080) {
 constexpr uint32_t kAcceptLeave = 0x406415E3;
 X86_EXTERN_FUNC(__imp__sub_00155D50);
 X86_FUNC(sub_00155D50) {
+    if (app::Capturing() && ctx.ecx == g_window.screen && CategorySection() >= 0) {
+        ctx.esp += 4 + 0x10;
+        return;
+    }
     uint32_t message = kernel::R32(ctx.esp + 4);
     if ((message == kAccept || message == kAcceptLeave) && ctx.ecx == g_window.screen && CategorySection() >= 0) {
         uint32_t ecx = ctx.ecx;
