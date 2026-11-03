@@ -95,6 +95,9 @@ while true; do
     GAME_FILE=""
     if [[ -n $SOURCE ]]; then
         GAME_FILE="$SOURCE"
+    elif AUTO=$(find_game_auto 2>/dev/null) && [[ -n $AUTO && -f $AUTO ]]; then
+        GAME_FILE="$AUTO"
+        echo "Menggunakan game copy yang sudah ada di: $GAME_FILE"
     else
         # If GUI is available, immediately open file chooser so the user does NOT have to place anything manually!
         if command -v zenity >/dev/null 2>&1; then
@@ -331,8 +334,12 @@ dpad_left = "Left"
 dpad_right = "Right"
 start = "Escape"
 back = "R"
+look_up = "PageUp"
+look_down = "PageDown"
 settings_panel = "F10,Backtick"
 EOF
+elif ! grep -q "look_up" "$CONF" 2>/dev/null; then
+    sed -i '/\[keys\]/a look_up = "PageUp"\nlook_down = "PageDown"' "$CONF" 2>/dev/null || true
 fi
 
 say ""

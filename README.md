@@ -1,6 +1,6 @@
 # Need for Speed: Most Wanted (Black Edition) — Native Linux Port
 
-[![Release: v0.1.5](https://img.shields.io/badge/Release-v0.1.5-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.6](https://img.shields.io/badge/Release-v0.1.6-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -41,7 +41,18 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.5 (Latest)
+### Version 0.1.6 (Latest)
+- **Navigasi Multi-Tab Penuh pada Overlay F10**:
+  - Menghadirkan kembali bilah tab navigasi lengkap di bagian atas menu **F10** (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
+  - Pemain kini dapat berpindah tab secara instan, mengubah tombol keyboard dan stik controller secara visual melalui ImGui, mengaktifkan cheats, mengatur grafis, hingga membuka tautan pengembang dan tombol **Exit Game**.
+- **Solusi Tuntas Freeze Menu In-Game saat Rebinding Tombol**:
+  - Mengatasi masalah di mana menekan tombol `Enter` saat mengatur kontrol (status `< PRESS A KEY >`) dapat menyebabkan menu opsi (seperti karusel "Graphics") terkunci atau macet.
+  - Menambahkan *capture guard* pada `SwitchPackage` serta pembersihan `CancelCapture()` otomatis, sehingga perpindahan paket menu dibatalkan jika sedang dalam mode perekaman tombol dan navigasi menu tetap normal serta responsif.
+- **Deteksi Otomatis File Game untuk Update Cepat**:
+  - Skrip build launcher kini secara otomatis mendeteksi salinan file game yang sudah ada di sistem (`~/.local/share/nfsmw-linux/disc`), sehingga pembaruan versi langsung me-relink binary baru tanpa perlu memilih ulang file ISO atau membuka dialog Zenity.
+  - Memastikan konfigurasi `look_up = "PageUp"` dan `look_down = "PageDown"` otomatis terpasang pada `mostwanted.toml`.
+
+### Version 0.1.5
 - **Oper Gigi Drag Race Langsung Bekerja (Out-of-the-Box Drag Shifting)**:
   - Tombol oper gigi (Naik Gigi / Turun Gigi) kini di-mapping langsung ke **Page Up** (`PgUp`) dan **Page Down** (`PgDn`) (serta Numpad 8 dan Numpad 5).
   - Pengguna laptop tanpa keypad Numpad fisik (seperti Lenovo ThinkPad X270) langsung dapat bermain mode Drag Race dan mengoper gigi tanpa perlu repot konfigurasi manual.
@@ -108,12 +119,12 @@ Based on empirical testing on the ThinkPad X270, here are the minimum and recomm
 No terminal expertise required. Installing is completely automated:
 
 ### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.4_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
+Download the latest **`nfsmw-linux_0.1.6_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
 
 * **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
 * **Terminal Option**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.4_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.6_amd64.deb
   ```
 
 All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
@@ -186,7 +197,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.4_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.6_amd64.deb`.
 
 ---
 
@@ -194,9 +205,9 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.4_amd64.deb`
 
 ### 1. Linking Gagal pada Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
-* **Solusi di v0.1.4**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
+* **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.4_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.6_amd64.deb
   nfsmw-linux --rebuild
   ```
 

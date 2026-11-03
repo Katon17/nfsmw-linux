@@ -20,7 +20,7 @@ if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
 elif [[ -n $(git status --porcelain) ]]; then
     echo "Committing pending changes..."
     git add .
-    git commit -m "update: latest fixes and enhancements v0.1.5"
+    git commit -m "update: latest fixes and enhancements v0.1.6"
 fi
 
 if git remote | grep -q origin; then
@@ -39,7 +39,7 @@ echo "Jalankan perintah ini untuk push ke GitHub:"
 echo "  git push -u origin main"
 echo ""
 echo "Lalu upload release installer .deb via GitHub CLI (jika gh terpasang):"
-echo "  gh release create v0.1.5 release/nfsmw-linux_0.1.5_amd64.deb \\"
-echo "    --title \"Need for Speed: Most Wanted (Black Edition) v0.1.5\" \\"
-echo "    --notes \"Native Linux (x86_64) port. In-game drag race gear shift (PgUp/PgDn out of the box), conflict-free key rebinding, verified 100+ FPS on ThinkPad X270 (Intel HD 620). Maintained by Katon Bagaskoro.\""
+echo "  gh release create v0.1.6 release/nfsmw-linux_0.1.6_amd64.deb \\"
+echo "    --title \"Need for Speed: Most Wanted (Black Edition) v0.1.6\" \\"
+echo "    --notes \"Native Linux (x86_64) port. In-game drag race gear shift (PgUp/PgDn out of the box), multi-tab F10 overlay (Keyboard, Controller, Cheats, Settings, General, Credits), conflict-free key rebinding, verified 100+ FPS on ThinkPad X270 (Intel HD 620). Maintained by Katon Bagaskoro.\""
 echo "======================================================================"
