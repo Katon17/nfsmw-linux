@@ -559,8 +559,8 @@ std::atomic<int> g_pad_capture{-1};
 bool g_pad_capture_armed = false;
 std::chrono::steady_clock::time_point g_pad_capture_since;
 constexpr std::chrono::seconds kPadCaptureTimeout{5};
-// the panel shows the cheats alone; the settings are the game's own options menu (src/game/options_menu.cpp)
-constexpr int g_page = kCheatsPage;
+// the active page in the settings panel (F10)
+int g_page = kKeyboardPage;
 // the action's key and its alternate as their boxes show them, the alternate blank when there is none
 std::vector<std::string> KeyBoxes(size_t action) {
     std::string keys = input::Binding(action);
@@ -755,10 +755,31 @@ void Defaults() {
 }
 
 void DrawTitle() {
-    std::string title = Ui("CHEATS");
-    float title_pad = (ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(title.c_str()).x) * 0.5f;
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(title_pad, 0.0f));
-    ImGui::TextUnformatted(title.c_str());
+    static const int kPanelPages[] = {kKeyboardPage, kControllerPage, kCheatsPage, kSettingsPage, kGeneralPage, kCreditsPage};
+    float avail = ImGui::GetContentRegionAvail().x;
+    int count = int(std::size(kPanelPages));
+    float spacing = ImGui::GetStyle().ItemSpacing.x;
+    float btn_w = (avail - spacing * float(count - 1)) / float(count);
+
+    for (int i = 0; i < count; i++) {
+        if (i > 0) ImGui::SameLine();
+        int page = kPanelPages[i];
+        bool selected = (g_page == page);
+        if (selected) {
+            ImGui::PushStyleColor(ImGuiCol_Button, kHighlight);
+            ImGui::PushStyleColor(ImGuiCol_Text, kHeading);
+        } else {
+            ImGui::PushStyleColor(ImGuiCol_Button, kButton);
+            ImGui::PushStyleColor(ImGuiCol_Text, kText);
+        }
+        std::string label = Ui(kPages[page], false);
+        if (ImGui::Button(label.c_str(), ImVec2(btn_w, 0))) {
+            g_capture = -1;
+            g_pad_capture = -1;
+            g_page = page;
+        }
+        ImGui::PopStyleColor(2);
+    }
 }
 
 constexpr const char* kCredit = "Port by Katon Bagaskoro";
@@ -809,7 +830,7 @@ void DrawPanel() {
     const ImGuiViewport* vp = ImGui::GetMainViewport();
     float em = ImGui::GetFontSize();
     ImGui::SetNextWindowPos(vp->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(ImVec2(em * 40, em * 16), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(em * 42, em * 20), ImGuiCond_Always);
     for (const auto& [col, color] : kPanelColors) ImGui::PushStyleColor(col, color);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -988,6 +1009,11 @@ void rows::Defaults(int page) {
     g_capture = -1;
     g_pad_capture = -1;
     RestoreDefaults(page);
+}
+
+void rows::CancelCapture() {
+    g_capture = -1;
+    g_pad_capture = -1;
 }
 
 bool MenuOpen() { return g_open.load(std::memory_order_relaxed); }

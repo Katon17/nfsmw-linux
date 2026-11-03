@@ -11,11 +11,11 @@ namespace game {
 
 namespace {
 
-// port 0 has the touch controls, the keyboard and mouse; the game sees no input while the panel is open or while capturing keys
+// port 0 has the touch controls, the keyboard and mouse; the game sees no input while the panel is open
 void Pad(int port, input::Pad& pad) {
     input::SeenPad(pad);
     if (port == 0) pad.connected = true;
-    if (app::MenuOpen() || app::Capturing()) pad = input::Pad{.connected = pad.connected};
+    if (app::MenuOpen()) pad = input::Pad{.connected = pad.connected};
     else if (port == 0) input::Keyboard(pad);
 }
 

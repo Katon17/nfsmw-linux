@@ -189,7 +189,7 @@ std::string Join(const std::vector<int>& vks) {
     return s;
 }
 
-bool Active() { return host::Foreground() && !app::MenuOpen() && !app::Capturing(); }
+bool Active() { return host::Foreground() && !app::MenuOpen(); }
 bool Wheel(int vk) { return vk == kWheelUp || vk == kWheelDown; }
 bool Down(int vk) {
     if (Wheel(vk)) return NowMs() - g_wheel_ms[vk == kWheelDown] < kTapMs;

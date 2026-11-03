@@ -33,6 +33,7 @@ std::string Label(const Row& r);                // translated
 std::string Value(const Row& r, int step = 0);  // as shown, stepped first; empty for a heading
 void Activate(const Row& r);  // a link opens; a bind row waits for its input, PollBinding takes it
 bool PollBinding();           // a bind row's wait took its input or gave up, once
+void CancelCapture();         // cancel any pending key or pad capture
 void Defaults(int page);
 
 }  // namespace rows

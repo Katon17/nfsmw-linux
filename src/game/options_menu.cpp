@@ -794,6 +794,7 @@ X86_FUNC(sub_0012A030) {
 // the game's own (0x105029). The icon's React runs within it, so the category is read after
 X86_EXTERN_FUNC(__imp__sub_00104D40);
 X86_FUNC(sub_00104D40) {
+    app::rows::CancelCapture();
     uint32_t menu = ctx.ecx;
     bool fade = kernel::R32(ctx.esp + 4) == kFadeDone && kernel::R32(menu + kMainLast) == kAccept;
     __imp__sub_00104D40(ctx, base);
@@ -824,10 +825,6 @@ X86_FUNC(sub_00153080) {
 constexpr uint32_t kAcceptLeave = 0x406415E3;
 X86_EXTERN_FUNC(__imp__sub_00155D50);
 X86_FUNC(sub_00155D50) {
-    if (app::Capturing() && ctx.ecx == g_window.screen && CategorySection() >= 0) {
-        ctx.esp += 4 + 0x10;
-        return;
-    }
     uint32_t message = kernel::R32(ctx.esp + 4);
     if ((message == kAccept || message == kAcceptLeave) && ctx.ecx == g_window.screen && CategorySection() >= 0) {
         uint32_t ecx = ctx.ecx;
@@ -867,6 +864,13 @@ X86_FUNC(sub_000EE570) {
 // back to ANDROID OPTIONS' icons
 X86_EXTERN_FUNC(__imp__sub_000EB160);
 X86_FUNC(sub_000EB160) {
+    if (kernel::R32(ctx.esp) == kScreenBack && g_waiting) {
+        // While capturing a key, do not leave the screen
+        ctx.esp += 4 + 0x10;
+        return;
+    }
+    g_waiting = 0;
+    app::rows::CancelCapture();
     int section = kernel::R32(ctx.esp) == kScreenBack ? CategorySection() : -1;
     if (section >= 0 && section < kAndroidSection) g_android_next = true;
     __imp__sub_000EB160(ctx, base);
