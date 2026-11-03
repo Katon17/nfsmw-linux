@@ -590,7 +590,8 @@ int BindRow(const char* label, const std::vector<std::string>& keys, int capturi
         float x = value_end - float(n - i) * box_w - float(n - 1 - i) * style.ItemSpacing.x;
         ImGui::SetCursorPos(ImVec2(x, row.row_y));
         ImGui::PushID(i);
-        if (ImGui::InvisibleButton("##key", ImVec2(box_w, row.row_h))) pressed = i;
+        ImGui::InvisibleButton("##key", ImVec2(box_w, row.row_h));
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) pressed = i;
         bool deleted = ImGui::IsItemFocused() && ImGui::IsKeyPressed(ImGuiKey_Delete, false);
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right) || deleted) cleared = i;
         bool pointed = ImGui::IsItemHovered() || ImGui::IsItemFocused();
@@ -1102,6 +1103,11 @@ void DrawUi(double fps) {
     float base = io.Fonts->Fonts.empty() ? 13.0f : io.Fonts->Fonts[0]->FontSize;
     io.FontGlobalScale = std::max(1.0f, io.DisplaySize.y / 540.0f) * 13.0f / base;
     if (MenuOpen()) {
+        if (Capturing()) {
+            io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
+        } else {
+            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        }
         PollCapture();
         PollPadCapture();
         DrawPanel();

@@ -109,14 +109,14 @@ bool g_android_next = false;  // the next UIOptionsMain is ANDROID OPTIONS: the 
 uint32_t g_android_menu = 0;  // the UIOptionsMain that is
 uint32_t g_android_react = 0;  // the React of OPTIONS beside ANDROID OPTIONS
 
-// the panel's pages in three: graphics; the touch controls, keyboard and controller; the general settings and the
-// credits
+// the panel's pages in two: graphics; the general settings and the credits
 struct Section {
     const char* name;
     std::vector<int> pages;
+    int icon;
 };
 // the last is the menu that holds them, the main menu's icon
-const Section kSections[] = {{"GRAPHICS", {0}}, {"CONTROLS", {1, 3, 4}}, {"GENERAL", {2, 5}}, {"LINUX OPTIONS", {}}};
+const Section kSections[] = {{"GRAPHICS", {0}, 0}, {"GENERAL", {2, 5}, 2}, {"LINUX OPTIONS", {}, 3}};
 constexpr int kSectionCount = int(std::size(kSections));
 constexpr int kAndroidSection = kSectionCount - 1;
 static_assert(kSectionCount <= kIconCount, "tools/option_icons.py draws an icon a section");
@@ -332,7 +332,7 @@ void AddIcons(X86Context& ctx, uint32_t menu, int first, int last) {
     for (int section = first; section < last && SlotFree(ctx, menu); section++) {
         uint32_t option = CallGuest(ctx, kNew, {kIconOptionSize});
         if (!option) break;
-        CallThis(ctx, option, kIconCtor, {kIconHashes + uint32_t(section), 0, 0});
+        CallThis(ctx, option, kIconCtor, {kIconHashes + uint32_t(kSections[section].icon), 0, 0});
         W32(option, g_icon_vtable);
         g_icons[option] = section;
         CallThis(ctx, menu, kAddIcon, {option});
@@ -663,7 +663,7 @@ void AddRows(X86Context& ctx, uint32_t screen, int section) {
     uint32_t package = R32(screen + kScreenPackage);
     uint32_t icon = FindObject(ctx, package, kHeaderIcon);
     if (icon && R32(icon + kObjectType) == kTypeImage) {
-        W32(icon + kImageTexture, kIconHashes + uint32_t(section));
+        W32(icon + kImageTexture, kIconHashes + uint32_t(kSections[section].icon));
         W32(icon + kObjectFlags, R32(icon + kObjectFlags) | kImageDirty);
     }
     uint32_t title = FindObject(ctx, package, kHeaderTitle);

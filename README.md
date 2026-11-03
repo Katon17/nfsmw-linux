@@ -1,6 +1,6 @@
 # Need for Speed: Most Wanted (Black Edition) — Native Linux Port
 
-[![Release: v0.1.6](https://img.shields.io/badge/Release-v0.1.6-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.7](https://img.shields.io/badge/Release-v0.1.7-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -41,7 +41,16 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.6 (Latest)
+### Version 0.1.7 (Latest)
+- **Pengaturan Kontrol Eksklusif & Nyaman via Overlay F10**:
+  - Menghilangkan bagian *Controls* pada karusel menu opsi bawaan in-game ("setting biasa") sehingga pemain tidak lagi mengalami bentrok tombol atau freeze.
+  - Seluruh konfigurasi tombol keyboard dan stik controller kini terpusat secara visual dan mulus di dalam menu **F10** (**Keyboard** & **Controller**).
+- **Perbaikan Bentrok Tombol Enter pada Pengaturan Kontrol**:
+  - Perekaman tombol (*Key Capture*) kini dipicu secara eksklusif hanya melalui klik kiri mouse pada kotak tombol, sehingga menekan tombol `Enter` atau `Space` tidak akan memicu aktivasi tombol ImGui yang tidak diinginkan.
+  - Menonaktifkan navigasi keyboard ImGui selama proses perekaman tombol aktif (`Capturing()`), sehingga tombol `Enter`, `Space`, ataupun tanda panah dapat langsung di-bind secara bersih tanpa interupsi.
+  - Menambahkan proteksi *duplicate unbind* otomatis di `input::Bind()`: jika tombol (misalnya `Enter`) di-bind ke aksi baru, tombol tersebut otomatis dilepas dari aksi lain agar tidak terjadi input ganda yang saling bertabrakan.
+
+### Version 0.1.6
 - **Navigasi Multi-Tab Penuh pada Overlay F10**:
   - Menghadirkan kembali bilah tab navigasi lengkap di bagian atas menu **F10** (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
   - Pemain kini dapat berpindah tab secara instan, mengubah tombol keyboard dan stik controller secara visual melalui ImGui, mengaktifkan cheats, mengatur grafis, hingga membuka tautan pengembang dan tombol **Exit Game**.
@@ -119,12 +128,12 @@ Based on empirical testing on the ThinkPad X270, here are the minimum and recomm
 No terminal expertise required. Installing is completely automated:
 
 ### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.6_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
+Download the latest **`nfsmw-linux_0.1.7_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
 
 * **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
 * **Terminal Option**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.6_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.7_amd64.deb
   ```
 
 All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
@@ -197,7 +206,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.6_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`.
 
 ---
 
@@ -207,7 +216,7 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.6_amd64.deb`
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.6_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.7_amd64.deb
   nfsmw-linux --rebuild
   ```
 

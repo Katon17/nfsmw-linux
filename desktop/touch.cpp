@@ -354,6 +354,17 @@ void Bind(size_t action, int vk, int slot) {
     if (kActions[action].button == kHostKey && Mouse(vk)) return;
     {
         std::lock_guard lock(g_bind_lock);
+        if (vk) {
+            for (size_t a = 0; a < kCount; a++) {
+                if (a == action) continue;
+                std::vector<int>& other = g_binds[a];
+                auto it = std::find(other.begin(), other.end(), vk);
+                if (it != other.end()) {
+                    other.erase(it);
+                    game::Opt().keys[kActions[a].action.id] = Join(other);
+                }
+            }
+        }
         std::vector<int>& keys = g_binds[action];
         int slots[2] = {0, 0};
         for (size_t i = 0; i < keys.size() && i < 2; i++) slots[i] = keys[i];
