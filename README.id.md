@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.4](https://img.shields.io/badge/Release-v0.1.4-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.7](https://img.shields.io/badge/Release-v0.1.7-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -43,7 +43,37 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.4 (Terbaru)
+### Versi 0.1.7 (Terbaru)
+- **Pengaturan Kontrol Eksklusif & Nyaman via Overlay F10**:
+  - Menghilangkan bagian *Controls* pada karusel menu opsi bawaan in-game ("setting biasa") sehingga pemain tidak lagi mengalami bentrok tombol atau freeze.
+  - Seluruh konfigurasi tombol keyboard dan stik controller kini terpusat secara visual dan mulus di dalam menu **F10** (**Keyboard** & **Controller**).
+- **Perbaikan Bentrok Tombol Enter pada Pengaturan Kontrol**:
+  - Perekaman tombol (*Key Capture*) kini dipicu secara eksklusif hanya melalui klik kiri mouse pada kotak tombol, sehingga menekan tombol `Enter` atau `Space` tidak akan memicu aktivasi tombol ImGui yang tidak diinginkan.
+  - Menonaktifkan navigasi keyboard ImGui selama proses perekaman tombol aktif (`Capturing()`), sehingga tombol `Enter`, `Space`, ataupun tanda panah dapat langsung di-bind secara bersih tanpa interupsi.
+  - Menambahkan proteksi *duplicate unbind* otomatis di `input::Bind()`: jika tombol (misalnya `Enter`) di-bind ke aksi baru, tombol tersebut otomatis dilepas dari aksi lain agar tidak terjadi input ganda yang saling bertabrakan.
+
+### Versi 0.1.6
+- **Navigasi Multi-Tab Penuh pada Overlay F10**:
+  - Menghadirkan kembali bilah tab navigasi lengkap di bagian atas menu **F10** (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
+  - Pemain kini dapat berpindah tab secara instan, mengubah tombol keyboard dan stik controller secara visual melalui ImGui, mengaktifkan cheats, mengatur grafis, hingga membuka tautan pengembang dan tombol **Exit Game**.
+- **Solusi Tuntas Freeze Menu In-Game saat Rebinding Tombol**:
+  - Mengatasi masalah di mana menekan tombol `Enter` saat mengatur kontrol (status `< PRESS A KEY >`) dapat menyebabkan menu opsi (seperti karusel "Graphics") terkunci atau macet.
+  - Menambahkan *capture guard* pada `SwitchPackage` serta pembersihan `CancelCapture()` otomatis, sehingga perpindahan paket menu dibatalkan jika sedang dalam mode perekaman tombol dan navigasi menu tetap normal serta responsif.
+- **Deteksi Otomatis File Game untuk Update Cepat**:
+  - Skrip build launcher kini secara otomatis mendeteksi salinan file game yang sudah ada di sistem (`~/.local/share/nfsmw-linux/disc`), sehingga pembaruan versi langsung me-relink binary baru tanpa perlu memilih ulang file ISO atau membuka dialog Zenity.
+  - Memastikan konfigurasi `look_up = "PageUp"` dan `look_down = "PageDown"` otomatis terpasang pada `mostwanted.toml`.
+
+### Versi 0.1.5
+- **Oper Gigi Drag Race Langsung Bekerja (Out-of-the-Box Drag Shifting)**:
+  - Tombol oper gigi (Naik Gigi / Turun Gigi) kini di-mapping langsung ke **Page Up** (`PgUp`) dan **Page Down** (`PgDn`) (serta Numpad 8 dan Numpad 5).
+  - Pengguna laptop tanpa keypad Numpad fisik (seperti Lenovo ThinkPad X270) langsung dapat bermain mode Drag Race dan mengoper gigi tanpa perlu repot konfigurasi manual.
+- **Perbaikan Bentrok Tombol Enter / Accept saat Mengatur Kontrol In-Game**:
+  - Mengatasi masalah di mana tombol `Enter` bentrok antara fungsi navigasi `Accept / OK` menu dan perekaman tombol baru (*Key Capture*).
+  - Mengisolasi input stik controller selama proses perekaman tombol berlangsung (`app::Capturing()`), sehingga pemain dapat mengganti tombol apa pun langsung dari menu game secara mulus tanpa terpotong atau tertutup otomatis.
+- **Penyempurnaan Label Menu Kontrol**:
+  - Mengubah label menu di bagian Kontrol dari yang sebelumnya hanya *"Look Up"* dan *"Look Down"* menjadi: **"SHIFT UP / LOOK UP"** dan **"SHIFT DOWN / LOOK DOWN"**.
+
+### Versi 0.1.4
 - **Tautan Resmi Pengembang (Support & Media)**:
   - Menu **General > SUPPORT** kini langsung terhubung ke profil resmi [Katon Bagaskoro](https://github.com/Katon17):
     - **DONATE**: [Saweria (saweria.co/Kabako)](https://saweria.co/Kabako)
@@ -100,12 +130,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.4_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.7_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.4_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.7_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -137,6 +167,8 @@ Kontrol sudah dikonfigurasi sejak awal agar sesuai tata letak PC Need for Speed 
 | **Belok Kiri** | `A` | Putar roda ke kiri (Analog stick) |
 | **Belok Kanan** | `D` | Putar roda ke kanan (Analog stick) |
 | **Handbrake / Drift** | `Spacebar` | Rem tangan untuk power slide dan tikungan tajam |
+| **Naik Gigi (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi pada mode Drag Race (Right Stick Up) |
+| **Turun Gigi (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi pada mode Drag Race (Right Stick Down) |
 | **Nitrous (NOS)** | `Left Shift` | Boost nitrous oksida |
 | **Speedbreaker** | `X` | Slow motion bullet-time |
 | **Lihat Belakang (Rear View)** | `C` | Melihat ke belakang mobil |
@@ -153,6 +185,8 @@ Dukungan controller plug-and-play melalui SDL3:
 - **Gas / Akselerasi**: Right Trigger (`RT` / `R2`)
 - **Rem / Mundur**: Left Trigger (`LT` / `L2`)
 - **Belok**: Left Analog Stick
+- **Naik Gigi (Drag / Manual)**: Right Analog Stick Up
+- **Turun Gigi (Drag / Manual)**: Right Analog Stick Down
 - **Handbrake**: `A` (Xbox) / `Cross` (PlayStation)
 - **Nitrous**: `B` (Xbox) / `Circle` (PlayStation)
 - **Speedbreaker**: `X` (Xbox) / `Square` (PlayStation)
@@ -174,7 +208,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.4_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.7_amd64.deb`.
 
 ---
 
@@ -182,9 +216,9 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.4_amd64.deb`.
 
 ### 1. Linking Gagal pada Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
-* **Solusi di v0.1.4**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
+* **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.4_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.7_amd64.deb
   nfsmw-linux --rebuild
   ```
 

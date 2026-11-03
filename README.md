@@ -1,5 +1,7 @@
 # Need for Speed: Most Wanted (Black Edition) — Native Linux Port
 
+🇮🇩 **Bahasa Indonesia**: lihat [README.id.md](README.id.md)
+
 [![Release: v0.1.7](https://img.shields.io/badge/Release-v0.1.7-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
@@ -14,6 +16,10 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 ---
 
 ## 📸 Screenshots
+
+| New Settings Icon | General Menu, Credits, and Exit Game |
+|:---:|:---:|
+| ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Menu, Credits, and Exit Game](screenshots/general_menu_credits_exit.png) |
 
 | Gameplay Prologue Race (Locked 61 FPS) | Lenovo ThinkPad X270 Hardware Specs |
 |:---:|:---:|
@@ -38,57 +44,57 @@ Traditional methods for running classic console games on Linux suffer from sever
 ## 🆕 What's New & Changelog
 
 ### Version 0.1.7 (Latest)
-- **Pengaturan Kontrol Eksklusif & Nyaman via Overlay F10**:
-  - Menghilangkan bagian *Controls* pada karusel menu opsi bawaan in-game ("setting biasa") sehingga pemain tidak lagi mengalami bentrok tombol atau freeze.
-  - Seluruh konfigurasi tombol keyboard dan stik controller kini terpusat secara visual dan mulus di dalam menu **F10** (**Keyboard** & **Controller**).
-- **Perbaikan Bentrok Tombol Enter pada Pengaturan Kontrol**:
-  - Perekaman tombol (*Key Capture*) kini dipicu secara eksklusif hanya melalui klik kiri mouse pada kotak tombol, sehingga menekan tombol `Enter` atau `Space` tidak akan memicu aktivasi tombol ImGui yang tidak diinginkan.
-  - Menonaktifkan navigasi keyboard ImGui selama proses perekaman tombol aktif (`Capturing()`), sehingga tombol `Enter`, `Space`, ataupun tanda panah dapat langsung di-bind secara bersih tanpa interupsi.
-  - Menambahkan proteksi *duplicate unbind* otomatis di `input::Bind()`: jika tombol (misalnya `Enter`) di-bind ke aksi baru, tombol tersebut otomatis dilepas dari aksi lain agar tidak terjadi input ganda yang saling bertabrakan.
+- **Exclusive & Comfortable Control Settings via the F10 Overlay**:
+  - Removed the *Controls* section from the built-in in-game options carousel ("regular settings"), so players no longer experience key conflicts or freezes.
+  - All keyboard and controller stick configuration is now centralized visually and smoothly inside the **F10** menu (**Keyboard** & **Controller**).
+- **Enter Key Conflict Fix in Control Settings**:
+  - Key capture is now triggered exclusively by a left mouse click on the key box, so pressing `Enter` or `Space` no longer triggers unwanted ImGui button activation.
+  - Disabled ImGui keyboard navigation while key capture is active (`Capturing()`), so `Enter`, `Space`, or arrow keys can be bound cleanly without interruption.
+  - Added automatic *duplicate unbind* protection in `input::Bind()`: if a key (e.g. `Enter`) is bound to a new action, it is automatically released from other actions to prevent conflicting double input.
 
 ### Version 0.1.6
-- **Navigasi Multi-Tab Penuh pada Overlay F10**:
-  - Menghadirkan kembali bilah tab navigasi lengkap di bagian atas menu **F10** (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
-  - Pemain kini dapat berpindah tab secara instan, mengubah tombol keyboard dan stik controller secara visual melalui ImGui, mengaktifkan cheats, mengatur grafis, hingga membuka tautan pengembang dan tombol **Exit Game**.
-- **Solusi Tuntas Freeze Menu In-Game saat Rebinding Tombol**:
-  - Mengatasi masalah di mana menekan tombol `Enter` saat mengatur kontrol (status `< PRESS A KEY >`) dapat menyebabkan menu opsi (seperti karusel "Graphics") terkunci atau macet.
-  - Menambahkan *capture guard* pada `SwitchPackage` serta pembersihan `CancelCapture()` otomatis, sehingga perpindahan paket menu dibatalkan jika sedang dalam mode perekaman tombol dan navigasi menu tetap normal serta responsif.
-- **Deteksi Otomatis File Game untuk Update Cepat**:
-  - Skrip build launcher kini secara otomatis mendeteksi salinan file game yang sudah ada di sistem (`~/.local/share/nfsmw-linux/disc`), sehingga pembaruan versi langsung me-relink binary baru tanpa perlu memilih ulang file ISO atau membuka dialog Zenity.
-  - Memastikan konfigurasi `look_up = "PageUp"` dan `look_down = "PageDown"` otomatis terpasang pada `mostwanted.toml`.
+- **Full Multi-Tab Navigation on the F10 Overlay**:
+  - Restored the full tab navigation bar at the top of the **F10** menu (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
+  - Players can now switch tabs instantly, visually rebind keyboard keys and controller sticks via ImGui, enable cheats, adjust graphics, and open developer links and the **Exit Game** button.
+- **Definitive Fix for In-Game Menu Freeze During Key Rebinding**:
+  - Fixed an issue where pressing `Enter` while configuring controls (status `< PRESS A KEY >`) could lock or freeze the options menu (such as the "Graphics" carousel).
+  - Added a *capture guard* to `SwitchPackage` plus automatic `CancelCapture()` cleanup, so menu package switching is cancelled while in key-capture mode and menu navigation stays normal and responsive.
+- **Automatic Game File Detection for Fast Updates**:
+  - The launcher build script now automatically detects existing game file copies on the system (`~/.local/share/nfsmw-linux/disc`), so version updates simply relink the new binary without re-selecting the ISO file or opening the Zenity dialog.
+  - Ensures `look_up = "PageUp"` and `look_down = "PageDown"` are automatically set in `mostwanted.toml`.
 
 ### Version 0.1.5
-- **Oper Gigi Drag Race Langsung Bekerja (Out-of-the-Box Drag Shifting)**:
-  - Tombol oper gigi (Naik Gigi / Turun Gigi) kini di-mapping langsung ke **Page Up** (`PgUp`) dan **Page Down** (`PgDn`) (serta Numpad 8 dan Numpad 5).
-  - Pengguna laptop tanpa keypad Numpad fisik (seperti Lenovo ThinkPad X270) langsung dapat bermain mode Drag Race dan mengoper gigi tanpa perlu repot konfigurasi manual.
-- **Perbaikan Bentrok Tombol Enter / Accept saat Mengatur Kontrol In-Game**:
-  - Mengatasi masalah di mana tombol `Enter` bentrok antara fungsi navigasi `Accept / OK` menu dan perekaman tombol baru (*Key Capture*).
-  - Mengisolasi input stik controller selama proses perekaman tombol berlangsung (`app::Capturing()`), sehingga pemain dapat mengganti tombol apa pun langsung dari menu game secara mulus tanpa terpotong atau tertutup otomatis.
-- **Penyempurnaan Label Menu Kontrol**:
-  - Mengubah label menu di bagian Kontrol dari yang sebelumnya hanya *"Look Up"* dan *"Look Down"* menjadi: **"SHIFT UP / LOOK UP"** dan **"SHIFT DOWN / LOOK DOWN"**.
+- **Drag Race Gear Shifting Works Out-of-the-Box**:
+  - Gear shift buttons (Shift Up / Shift Down) are now mapped directly to **Page Up** (`PgUp`) and **Page Down** (`PgDn`) (as well as Numpad 8 and Numpad 5).
+  - Laptop users without a physical Numpad (such as the Lenovo ThinkPad X270) can immediately play Drag Race mode and shift gears without manual configuration.
+- **Enter / Accept Key Conflict Fix When Configuring In-Game Controls**:
+  - Fixed an issue where the `Enter` key conflicted between menu navigation (`Accept / OK`) and new key capture.
+  - Isolated controller stick input during key capture (`app::Capturing()`), so players can rebind any key directly from the in-game menu smoothly without being cut off or auto-closed.
+- **Control Menu Label Refinement**:
+  - Changed the control menu labels from just *"Look Up"* and *"Look Down"* to: **"SHIFT UP / LOOK UP"** and **"SHIFT DOWN / LOOK DOWN"**.
 
 ### Version 0.1.4
-- **Tautan Resmi Pengembang (Support & Media)**:
-  - Menu **General > SUPPORT** kini langsung terhubung ke profil resmi [Katon Bagaskoro](https://github.com/Katon17):
+- **Official Developer Links (Support & Media)**:
+  - The **General > SUPPORT** menu now links directly to the official [Katon Bagaskoro](https://github.com/Katon17) profiles:
     - **DONATE**: [Saweria (saweria.co/Kabako)](https://saweria.co/Kabako)
     - **GITHUB**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
     - **YOUTUBE**: [@KabakoNT (youtube.com/@KabakoNT)](https://www.youtube.com/@KabakoNT)
-- **Fitur Baru "EXIT GAME" (Keluar Game)**:
-  - Menambahkan menu `EXIT GAME` di dalam opsi **General** dan overlay **F10** untuk menutup permainan secara bersih ke desktop Linux (mem-flush log, membebaskan memori Vulkan/SDL3 tanpa meninggalkan proses *zombie*).
-  - Tersedia terjemahan otomatis dalam Bahasa Indonesia (`Keluar Game` ➔ `Keluar`) dan berbagai bahasa lainnya.
-- **Kredit Tim (Dual Port Credits)**:
-  - Menyempurnakan daftar **Credits** dengan mengapresiasi **Rangga Casper** sebagai pembuat port Android asal, dan **Katon Bagaskoro** sebagai pengembang port native Linux.
-- **Tampilan Antarmuka Khusus Linux (Linux Options & Tux Icon)**:
-  - Opsi di menu utama kini bertuliskan **"Linux Options"** (atau **"Opsi Linux"**).
-  - Mengganti ikon robot Android dengan ikon custom **Tux the Linux Penguin** bersanding dengan roda gigi pengaturan dalam gaya monokrom khas Need for Speed.
-- **Perbaikan Masalah Linking Step `[3/3]` (Ernawan's Fix)**:
-  - Mengimplementasikan *weak symbols* (`__attribute__((weak))`) dan argumen linker `-Wl,--allow-multiple-definition`.
-  - Menghilangkan sepenuhnya error *duplicate symbol* maupun *undefined symbol* (`input::PadActions`, `host::SamplePerf`).
-- **Perbaikan Freeze / Stuck Loading Prologue Race 2 (Yokaiju's Fix)**:
-  - Mengatasi *deadlock* Vulkan fence saat transisi balapan mengalahkan SLR McLaren hitam (Bull) dengan pembatasan timeout 5 detik (`kGpuWaitTimeoutNs`).
-  - Mengganti `Destroy(down)` menjadi `Retire(down)` agar tekstur transfer in-flight tidak terhapus prematur saat GPU masih membaca data.
-  - Mengaktifkan fitur lewati video cutscene transisi secara manual kapan saja dengan tombol **Enter** atau **Spacebar** / Controller **A**.
-  - Membersihkan partisi scratch cache sementara Xbox (`hdd/X`, `hdd/Y`, `hdd/Z`) secara otomatis pada setiap boot game tanpa menyentuh progress save karier (`hdd/E/UDATA`).
+- **New "EXIT GAME" Feature**:
+  - Added an `EXIT GAME` menu inside the **General** options and the **F10** overlay to cleanly quit the game to the Linux desktop (flushes logs, frees Vulkan/SDL3 memory without leaving *zombie* processes).
+  - Automatic translations available in Indonesian (`Keluar Game` ➔ `Keluar`) and several other languages.
+- **Team Credits (Dual Port Credits)**:
+  - Refined the **Credits** list, appreciating **Rangga Casper** as the original Android port creator and **Katon Bagaskoro** as the native Linux port developer.
+- **Linux-Specific UI (Linux Options & Tux Icon)**:
+  - Main menu options now read **"Linux Options"** (or **"Opsi Linux"**).
+  - Replaced the Android robot icon with a custom **Tux the Linux Penguin** icon alongside the settings gears in the signature monochrome Need for Speed style.
+- **Linking Fix at Step `[3/3]` (Ernawan's Fix)**:
+  - Implemented *weak symbols* (`__attribute__((weak))`) and linker argument `-Wl,--allow-multiple-definition`.
+  - Completely eliminates *duplicate symbol* and *undefined symbol* errors (`input::PadActions`, `host::SamplePerf`).
+- **Prologue Race 2 Freeze / Stuck Loading Fix (Yokaiju's Fix)**:
+  - Fixed the Vulkan fence *deadlock* during the race transition after defeating the black SLR McLaren (Bull) with a 5-second timeout limit (`kGpuWaitTimeoutNs`).
+  - Changed `Destroy(down)` to `Retire(down)` so in-flight transfer textures are not deleted prematurely while the GPU is still reading them.
+  - Enabled manual skipping of transition cutscene videos at any time with the **Enter** or **Spacebar** keys / Controller **A**.
+  - Automatically cleans the temporary Xbox scratch cache partitions (`hdd/X`, `hdd/Y`, `hdd/Z`) on every game boot without touching career save progress (`hdd/E/UDATA`).
 
 ---
 
@@ -101,7 +107,7 @@ Tested on real hardware by **Katon Bagaskoro**:
 * **GPU**: Intel® HD Graphics 620 (Mesa Vulkan driver)
 * **RAM**: 8 GB DDR4
 * **OS**: Linux Mint 22.3 (XFCE 64-bit, Kernel 6.8 / 7.0)
-* **In-Game Performance**: **104 – 121 FPS di Menu, Locked 60 – 61 FPS di Gameplay** pada resolusi native dengan zero stuttering, zero audio crackles, dan respons input instan.
+* **In-Game Performance**: **104 – 121 FPS in Menu, Locked 60 – 61 FPS in Gameplay** at native resolution with zero stuttering, zero audio crackles, and instant input response.
 
 ---
 
@@ -161,8 +167,8 @@ The controls are pre-configured out-of-the-box to match the canonical PC Need fo
 | **Steer Left** | `A` | Turn wheels left (Analog stick) |
 | **Steer Right** | `D` | Turn wheels right (Analog stick) |
 | **Handbrake / Drift** | `Spacebar` | E-brake for power slides and tight hairpins |
-| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi pada mode Drag Race (Right Stick Up) |
-| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi pada mode Drag Race (Right Stick Down) |
+| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Shift up in Drag Race mode (Right Stick Up) |
+| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Shift down in Drag Race mode (Right Stick Down) |
 | **Nitrous (NOS)** | `Left Shift` | Nitrous oxide boost |
 | **Speedbreaker** | `X` | Bullet-time slow motion |
 | **Look Back (Rear View)** | `C` | Look behind car |
@@ -206,27 +212,27 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`
 
 ---
 
-## 🔧 Troubleshooting & Solusi Masalah Populer
+## 🔧 Troubleshooting
 
-### 1. Linking Gagal pada Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
-* **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
-* **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
+### 1. Linking Failure at Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
+* **Cause**: Stub symbol conflicts between the host library and the linker on certain systems.
+* **Fix**: All input and host telemetry stubs are baked internally directly into `libnfsmw_host.a` with *weak symbols* and the linker flag `--allow-multiple-definition`. Just install the update:
   ```bash
   sudo dpkg -i nfsmw-linux_0.1.7_amd64.deb
   nfsmw-linux --rebuild
   ```
 
-### 2. Freeze / Stuck Loading setelah Mengalahkan SLR McLaren Hitam (Prologue Race 2)
-* **Penyebab**: 
-  1. Vulkan Fence deadlock (`UINT64_MAX` menunggu GPU tak terhingga saat transisi FMV/cutscene ke race berikutnya).
-  2. Partisi cache sementara Xbox (`hdd/X`, `hdd/Y`, `hdd/Z`) menyimpan dump sementara yang korup saat transisi loading.
-  3. Pemutaran FMV transisi tidak merespons tombol lewati (*skip*).
-* **Solusi di v0.1.4**:
-  - Vulkan fence timeout dibatasi maksimal 5 detik (`kGpuWaitTimeoutNs`) untuk mencegah GPU hang tanpa henti.
-  - Penanganan transfer image Vulkan di-upgrade ke `Retire(down)` agar tekstur in-flight tidak terhapus prematur.
-  - Cutscene transisi kini dapat dilewati secara manual kapan saja dengan menekan **Enter** atau **Spacebar** / Gamepad **A**.
-  - Partisi scratch cache Xbox (`X`, `Y`, `Z`) dibersihkan otomatis pada setiap boot game tanpa menyentuh progress save karier (`hdd/E/UDATA`).
-  - Pembersihan cache shader manual dapat dijalankan dengan:
+### 2. Freeze / Stuck Loading after Defeating the Black SLR McLaren (Prologue Race 2)
+* **Cause**: 
+  1. Vulkan Fence deadlock (`UINT64_MAX` waiting for the GPU indefinitely during the FMV/cutscene transition to the next race).
+  2. Temporary Xbox cache partitions (`hdd/X`, `hdd/Y`, `hdd/Z`) storing corrupt temporary dumps during loading transitions.
+  3. Transition FMV playback not responding to the skip button.
+* **Fix in v0.1.4**:
+  - Vulkan fence timeout capped at 5 seconds maximum (`kGpuWaitTimeoutNs`) to prevent endless GPU hangs.
+  - Vulkan image transfer handling upgraded to `Retire(down)` so in-flight textures are not deleted prematurely.
+  - Transition cutscenes can now be skipped manually at any time by pressing **Enter** or **Spacebar** / Gamepad **A**.
+  - Xbox scratch cache partitions (`X`, `Y`, `Z`) are automatically cleaned on every game boot without touching career save progress (`hdd/E/UDATA`).
+  - Manual shader cache cleaning can be run with:
     ```bash
     nfsmw-linux --clean-cache
     ```
@@ -244,10 +250,16 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`
 
 ## ☕ Support & Donations
 
-Jika proyek ini bermanfaat bagi Anda dan komunitas Linux gaming, Anda dapat mendukung pengembangannya melalui:
+If this project is useful to you and the Linux gaming community, you can support its development through:
 * 💰 **Saweria**: [saweria.co/Kabako](https://saweria.co/Kabako)
 * 📺 **YouTube**: [@KabakoNT](https://www.youtube.com/@KabakoNT)
 * ⭐ **GitHub Star**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
+
+---
+
+## ⚖️ License
+
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** — see [LICENSE](LICENSE). You are free to use, modify, and distribute it, provided derivative works remain open-source under the same license.
 
 ---
 
