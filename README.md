@@ -15,10 +15,6 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 
 ## 📸 Screenshots
 
-| Main Menu (121 FPS on ThinkPad X270) | General & Credits Menu (104 FPS) |
-|:---:|:---:|
-| ![Main Menu 121 FPS](screenshots/main_menu_121fps.png) | ![General Credits 104 FPS](screenshots/general_credits_104fps.png) |
-
 | Gameplay Prologue Race (Locked 61 FPS) | Lenovo ThinkPad X270 Hardware Specs |
 |:---:|:---:|
 | ![Gameplay 60 FPS](screenshots/gameplay_60fps.png) | ![ThinkPad X270 Specs](screenshots/thinkpad_x270_specs.png) |
