@@ -21,6 +21,10 @@ Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need f
 |:---:|:---:|
 | ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Menu, Credits, and Exit Game](screenshots/general_menu_credits_exit.png) |
 
+| Linux Options: Pengaturan Kontrol Dihapus | Overlay F10: Pengaturan Keyboard & Controller |
+|:---:|:---:|
+| ![Linux Options Tanpa Kontrol](screenshots/linux_options_no_controls.png) | ![Overlay F10 Keyboard](screenshots/f10_overlay_keyboard.png) |
+
 | Gameplay Balapan Prolog (Terkunci 61 FPS) | Spesifikasi Perangkat Lenovo ThinkPad X270 |
 |:---:|:---:|
 | ![Gameplay 60 FPS](screenshots/gameplay_60fps.png) | ![Spesifikasi ThinkPad X270](screenshots/thinkpad_x270_specs.png) |
