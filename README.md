@@ -21,6 +21,10 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 |:---:|:---:|
 | ![New Settings Icon](screenshots/new_settings_icon.png) | ![General Menu, Credits, and Exit Game](screenshots/general_menu_credits_exit.png) |
 
+| Linux Options: Control Settings Removed | F10 Overlay: Keyboard & Controller Settings |
+|:---:|:---:|
+| ![Linux Options No Controls](screenshots/linux_options_no_controls.png) | ![F10 Overlay Keyboard](screenshots/f10_overlay_keyboard.png) |
+
 | Gameplay Prologue Race (Locked 61 FPS) | Lenovo ThinkPad X270 Hardware Specs |
 |:---:|:---:|
 | ![Gameplay 60 FPS](screenshots/gameplay_60fps.png) | ![ThinkPad X270 Specs](screenshots/thinkpad_x270_specs.png) |
