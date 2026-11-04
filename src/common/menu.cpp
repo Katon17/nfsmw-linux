@@ -108,6 +108,7 @@ const char* const kAudioOutputNames[] = {"AUTOMATIC", "MONO", "2.0 STEREO", "5.1
 const char* const kLanguageNames[] = {"ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "SPANISH",
                                       "INDONESIAN"};  // as game::kLanguages
 constexpr const char* kDonateUrl = "https://saweria.co/Kabako";
+constexpr const char* kKofiUrl = "https://ko-fi.com/katonbagaskoro";
 constexpr const char* kGithubUrl = "https://github.com/Katon17/nfsmw-linux";
 constexpr const char* kYoutubeUrl = "https://www.youtube.com/@KabakoNT";
 constexpr uint32_t kFpsCaps[] = {30, 60, 75, 90, 120, 144, 165, 240, 360, kFpsCapRefresh, 0};
@@ -245,10 +246,10 @@ void Changed() {
 
 enum RowId { kRenderResolution, kMaxFps, kVsync, kFpsCounter, kAniso, kAudioOutput, kLanguage, kGyro,
              kGyroSensitivity, kTouchOpacity, kTouchSize, kTouchEdit, kCheckUpdates, kAspectRatio, kScreenFilter,
-             kAntiAliasing, kFpsPosition, kFpsTemps, kStickMode, kBloom, kFog, kDonate, kGithub, kYoutube, kFpsUsage,
+             kAntiAliasing, kFpsPosition, kFpsTemps, kStickMode, kBloom, kFog, kDonate, kKofi, kGithub, kYoutube, kFpsUsage,
              kReflections, kParticles, kRain, kRainDrops, kShadows, kRoadReflections,
              kCheatNos, kCheatSpeedbreaker, kCheatCash, kCheatNoPolice, kCheatUnlockAll,
-             kSkipMovies, kExitGame };
+             kSkipMovies, kExitGame, kYellowTint };
 
 using rows::Kind;
 using rows::Row;
@@ -276,6 +277,7 @@ constexpr Row kGraphicsRows[] = {
     {Kind::Value, kParticles, "PARTICLE EFFECTS"},
     {Kind::Value, kRain, "FALLING RAIN"},
     {Kind::Value, kRainDrops, "SCREEN RAINDROPS"},
+    {Kind::Value, kYellowTint, "YELLOW TINT"},
     {Kind::Value, kScreenFilter, "SCREEN FILTER"},
 };
 
@@ -320,7 +322,8 @@ constexpr Row kCreditRows[] = {
     {Kind::Info, 5, "LIBRARIES"},
     {Kind::Info, 6, "XBOX REFERENCES"},
     {Kind::Heading, -1, "SUPPORT"},
-    {Kind::Link, kDonate, "DONATE"},
+    {Kind::Link, kDonate, "DONATE (SAWERIA)"},
+    {Kind::Link, kKofi, "DONATE (KO-FI)"},
     {Kind::Link, kGithub, "GITHUB"},
     {Kind::Link, kYoutube, "YOUTUBE"},
     {Kind::Heading, -1, "QUIT"},
@@ -364,6 +367,7 @@ bool* ToggleFlag(Settings& s, int id) {
         case kRoadReflections: return &o.road_reflections;
         case kRain: return &o.rain;
         case kRainDrops: return &o.rain_drops;
+        case kYellowTint: return &o.yellow_tint;
         case kCheatNos: return &o.cheat_nos;
         case kCheatSpeedbreaker: return &o.cheat_speedbreaker;
         case kCheatCash: return &o.cheat_cash;
@@ -657,6 +661,7 @@ void ValueRow(const Row& r) {
 const char* LinkUrl(int id) {
     switch (id) {
         case kDonate: return kDonateUrl;
+        case kKofi: return kKofiUrl;
         case kGithub: return kGithubUrl;
         case kYoutube: return kYoutubeUrl;
         default: return nullptr;

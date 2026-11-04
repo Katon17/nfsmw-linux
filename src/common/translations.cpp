@@ -47,6 +47,7 @@ constexpr Entry kEntries[] = {
     {"PARTICLE EFFECTS", {u"Effets de particules", u"Partikeleffekte", u"Effetti particellari", u"Efectos de partículas", u"Efek partikel"}},
     {"FALLING RAIN", {u"Pluie", u"Regen", u"Pioggia", u"Lluvia", u"Hujan turun"}},
     {"SCREEN RAINDROPS", {u"Gouttes de pluie à l'écran", u"Regentropfen auf dem Bildschirm", u"Gocce di pioggia sullo schermo", u"Gotas de lluvia en pantalla", u"Tetes hujan di layar"}},
+    {"YELLOW TINT", {u"Teinte jaune", u"Gelbstich", u"Tinta gialla", u"Tinte amarillo", u"Filter kuning"}},
     {"BLOOM", {u"Flou lumineux", u"Bloom", u"Bloom", u"Resplandor", u"Bloom"}},
     {"ASPECT RATIO", {{}, {}, {}, {}, u"Rasio aspek"}},
     {"FULL SCREEN", {{}, {}, {}, {}, u"Layar penuh"}},
@@ -93,6 +94,8 @@ constexpr Entry kEntries[] = {
     {"XBOX REFERENCES", {u"Références Xbox", u"Xbox-Referenzen", u"Riferimenti Xbox", u"Referencias de Xbox", u"Referensi Xbox"}},
     {"SUPPORT", {u"Soutenir", u"Unterstützen", u"Supporta", u"Apoyar", u"Dukungan"}},
     {"DONATE", {u"Faire un don", u"Spenden", u"Dona", u"Donar", u"Donasi"}},
+    {"DONATE (SAWERIA)", {u"Faire un don (Saweria)", u"Spenden (Saweria)", u"Dona (Saweria)", u"Donar (Saweria)", u"Donasi (Saweria)"}},
+    {"DONATE (KO-FI)", {u"Faire un don (Ko-fi)", u"Spenden (Ko-fi)", u"Dona (Ko-fi)", u"Donar (Ko-fi)", u"Donasi (Ko-fi)"}},
     {"QUIT", {u"Quitter", u"Beenden", u"Esci", u"Salir", u"Keluar"}},
     {"EXIT GAME", {u"Quitter le jeu", u"Spiel beenden", u"Esci dal gioco", u"Salir del juego", u"Keluar Game"}},
 

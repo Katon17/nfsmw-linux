@@ -2,7 +2,7 @@
 
 🇮🇩 **Bahasa Indonesia**: lihat [README.id.md](README.id.md)
 
-[![Release: v0.1.7](https://img.shields.io/badge/Release-v0.1.7-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.8](https://img.shields.io/badge/Release-v0.1.8-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -10,6 +10,7 @@
 [![Recomp: XboxXBE-Recomp](https://img.shields.io/badge/Recomp-XboxXBE--Recomp-green.svg)](https://github.com/TGP482/XboxXBE-Recomp)
 [![Status: 100+ FPS Verified](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-verified-performance--system-specifications)
 [![Support: Saweria](https://img.shields.io/badge/Support-Saweria-orange.svg)](https://saweria.co/Kabako)
+[![Support: Ko-fi](https://img.shields.io/badge/Support-Ko--fi-ff5e5b.svg)](https://ko-fi.com/katonbagaskoro)
 
 A high-performance, native Linux desktop port and `.deb` packaging of **Need for Speed: Most Wanted (Black Edition)** (2005, original Xbox), maintained by [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), based on [RanggaCasper's MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android) and [TGP482's XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp).
 
@@ -29,6 +30,10 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 |:---:|:---:|
 | ![Gameplay 60 FPS](screenshots/gameplay_60fps.png) | ![ThinkPad X270 Specs](screenshots/thinkpad_x270_specs.png) |
 
+| Graphics: Yellow Tint Toggle | General Menu: Ko-fi & Saweria Support |
+|:---:|:---:|
+| ![Graphics Yellow Tint](screenshots/graphics_yellow_tint.png) | ![General Ko-fi Support](screenshots/general_kofi_support.png) |
+
 ---
 
 ## ⚡ Why This Native Port?
@@ -47,7 +52,15 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.7 (Latest)
+### Version 0.1.8 (Latest)
+- **Yellow Tint Filter Toggle ("YELLOW TINT" ON / OFF)**:
+  - Added a **"YELLOW TINT"** setting inside the in-game **Graphics** options and the F10 overlay, backed by the `yellow_tint` parameter in `mostwanted.toml`.
+  - Players can now choose between the classic sepia/yellow visual look of Need for Speed: Most Wanted (ON), or toggle it OFF to reveal vibrant, clean, natural lighting and true-to-life colors without breaking post-processing passes or weather effects.
+- **Official Ko-fi Donation Link in Credits & Support**:
+  - Added official **[Ko-fi (ko-fi.com/katonbagaskoro)](https://ko-fi.com/katonbagaskoro)** links directly inside the **Credits** and **General > SUPPORT** menus alongside Saweria.
+  - Clicking opens the donation page in your desktop Linux web browser with a single click.
+
+### Version 0.1.7
 - **Exclusive & Comfortable Control Settings via the F10 Overlay**:
   - Removed the *Controls* section from the built-in in-game options carousel ("regular settings"), so players no longer experience key conflicts or freezes.
   - All keyboard and controller stick configuration is now centralized visually and smoothly inside the **F10** menu (**Keyboard** & **Controller**).
@@ -134,12 +147,12 @@ Based on empirical testing on the ThinkPad X270, here are the minimum and recomm
 No terminal expertise required. Installing is completely automated:
 
 ### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.7_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
+Download the latest **`nfsmw-linux_0.1.8_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
 
 * **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
 * **Terminal Option**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.7_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.8_amd64.deb
   ```
 
 All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
@@ -212,7 +225,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.8_amd64.deb`.
 
 ---
 
@@ -222,7 +235,7 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`
 * **Cause**: Stub symbol conflicts between the host library and the linker on certain systems.
 * **Fix**: All input and host telemetry stubs are baked internally directly into `libnfsmw_host.a` with *weak symbols* and the linker flag `--allow-multiple-definition`. Just install the update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.7_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.8_amd64.deb
   nfsmw-linux --rebuild
   ```
 
@@ -256,6 +269,7 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.7_amd64.deb`
 
 If this project is useful to you and the Linux gaming community, you can support its development through:
 * 💰 **Saweria**: [saweria.co/Kabako](https://saweria.co/Kabako)
+* ☕ **Ko-fi**: [ko-fi.com/katonbagaskoro](https://ko-fi.com/katonbagaskoro)
 * 📺 **YouTube**: [@KabakoNT](https://www.youtube.com/@KabakoNT)
 * ⭐ **GitHub Star**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
 

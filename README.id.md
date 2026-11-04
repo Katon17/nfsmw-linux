@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.7](https://img.shields.io/badge/Release-v0.1.7-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.8](https://img.shields.io/badge/Release-v0.1.8-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -10,6 +10,7 @@
 [![Rekompilasi: XboxXBE-Recomp](https://img.shields.io/badge/Recomp-XboxXBE--Recomp-green.svg)](https://github.com/TGP482/XboxXBE-Recomp)
 [![Status: Terverifikasi 100+ FPS](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-performa-terverifikasi--spesifikasi-sistem)
 [![Dukungan: Saweria](https://img.shields.io/badge/Support-Saweria-orange.svg)](https://saweria.co/Kabako)
+[![Dukungan: Ko-fi](https://img.shields.io/badge/Support-Ko--fi-ff5e5b.svg)](https://ko-fi.com/katonbagaskoro)
 
 Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need for Speed: Most Wanted (Black Edition)** (2005, Xbox original), dikelola oleh [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), berbasis [MostWanted-Android dari RanggaCasper](https://github.com/RanggaCasper/MostWanted-Android) dan [XboxXBE-Recomp dari TGP482](https://github.com/TGP482/XboxXBE-Recomp).
 
@@ -29,6 +30,10 @@ Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need f
 |:---:|:---:|
 | ![Gameplay 60 FPS](screenshots/gameplay_60fps.png) | ![Spesifikasi ThinkPad X270](screenshots/thinkpad_x270_specs.png) |
 
+| Grafis: Toggle Filter Kuning (Yellow Tint) | Menu General: Dukungan Donasi Ko-fi & Saweria |
+|:---:|:---:|
+| ![Grafis Yellow Tint](screenshots/graphics_yellow_tint.png) | ![Dukungan Donasi Ko-fi](screenshots/general_kofi_support.png) |
+
 ---
 
 ## ⚡ Mengapa Port Native Ini?
@@ -47,7 +52,15 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.7 (Terbaru)
+### Versi 0.1.8 (Terbaru)
+- **Fitur Toggle Filter Kuning ("YELLOW TINT" ON / OFF)**:
+  - Menambahkan pengaturan **"YELLOW TINT"** di dalam menu **Graphics** in-game dan overlay F10, serta opsi konfigurasi `yellow_tint` pada `mostwanted.toml`.
+  - Pemain kini dapat memilih antara visual klasik bernuansa kuning/sepia khas Need for Speed: Most Wanted (ON), atau mematikannya (OFF) untuk menghasilkan pencahayaan alami yang jernih, tajam, dan realistis tanpa efek filter kuning.
+- **Tautan Donasi Resmi Ko-fi di Menu Credits & Support**:
+  - Menambahkan tombol donasi resmi **[Ko-fi (ko-fi.com/katonbagaskoro)](https://ko-fi.com/katonbagaskoro)** di bagian **SUPPORT** pada menu **Credits** dan **General**, bersanding dengan Saweria.
+  - Membuka tautan Ko-fi langsung di peramban desktop dengan sekali klik.
+
+### Versi 0.1.7
 - **Pengaturan Kontrol Eksklusif & Nyaman via Overlay F10**:
   - Menghilangkan bagian *Controls* pada karusel menu opsi bawaan in-game ("setting biasa") sehingga pemain tidak lagi mengalami bentrok tombol atau freeze.
   - Seluruh konfigurasi tombol keyboard dan stik controller kini terpusat secara visual dan mulus di dalam menu **F10** (**Keyboard** & **Controller**).
@@ -134,12 +147,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.7_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.8_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.7_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.8_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -212,7 +225,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.7_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.8_amd64.deb`.
 
 ---
 
@@ -222,7 +235,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.7_amd64.deb`.
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.7_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.8_amd64.deb
   nfsmw-linux --rebuild
   ```
 
@@ -256,6 +269,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.7_amd64.deb`.
 
 Jika proyek ini bermanfaat bagi Anda dan komunitas Linux gaming, Anda dapat mendukung pengembangannya melalui:
 * 💰 **Saweria**: [saweria.co/Kabako](https://saweria.co/Kabako)
+* ☕ **Ko-fi**: [ko-fi.com/katonbagaskoro](https://ko-fi.com/katonbagaskoro)
 * 📺 **YouTube**: [@KabakoNT](https://www.youtube.com/@KabakoNT)
 * ⭐ **GitHub Star**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
 
