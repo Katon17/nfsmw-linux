@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.8](https://img.shields.io/badge/Release-v0.1.8-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.9](https://img.shields.io/badge/Release-v0.1.9-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,12 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.8 (Terbaru)
+### Versi 0.1.9 (Terbaru)
+- **Pembersihan Menu Grafis (Menghilangkan Opsi Telemetri Non-Fungsional)**:
+  - Menghilangkan opsi **"SHOW CPU / GPU USAGE"** dan **"SHOW TEMPERATURES"** dari menu pengaturan Graphics in-game serta overlay F10.
+  - Kedua opsi tersebut merupakan fitur bawaan Android yang tidak memiliki indikator/fungsi di desktop Linux, sehingga menu pengaturan grafis kini menjadi lebih ringkas, bersih, dan bebas dari opsi dummy.
+
+### Versi 0.1.8
 - **Fitur Toggle Filter Kuning ("YELLOW TINT" ON / OFF)**:
   - Menambahkan pengaturan **"YELLOW TINT"** di dalam menu **Graphics** in-game dan overlay F10, serta opsi konfigurasi `yellow_tint` pada `mostwanted.toml`.
   - Pemain kini dapat memilih antara visual klasik bernuansa kuning/sepia khas Need for Speed: Most Wanted (ON), atau mematikannya (OFF) untuk menghasilkan pencahayaan alami yang jernih, tajam, dan realistis tanpa efek filter kuning.
@@ -147,12 +152,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.8_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.9_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.8_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.9_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -225,7 +230,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.8_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.9_amd64.deb`.
 
 ---
 
@@ -235,7 +240,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.8_amd64.deb`.
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.8_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.9_amd64.deb
   nfsmw-linux --rebuild
   ```
 

@@ -2,7 +2,7 @@
 
 🇮🇩 **Bahasa Indonesia**: lihat [README.id.md](README.id.md)
 
-[![Release: v0.1.8](https://img.shields.io/badge/Release-v0.1.8-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.9](https://img.shields.io/badge/Release-v0.1.9-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,12 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.8 (Latest)
+### Version 0.1.9 (Latest)
+- **Cleaned Up Graphics Menu (Removed Non-Functional Telemetry Options)**:
+  - Removed **"SHOW CPU / GPU USAGE"** and **"SHOW TEMPERATURES"** from the in-game **Graphics** options and the F10 overlay menu.
+  - These entries were legacy mobile Android holdovers whose Linux desktop stubs had no visible telemetry indicators, streamlining the graphics menu into a clean, functional layout.
+
+### Version 0.1.8
 - **Yellow Tint Filter Toggle ("YELLOW TINT" ON / OFF)**:
   - Added a **"YELLOW TINT"** setting inside the in-game **Graphics** options and the F10 overlay, backed by the `yellow_tint` parameter in `mostwanted.toml`.
   - Players can now choose between the classic sepia/yellow visual look of Need for Speed: Most Wanted (ON), or toggle it OFF to reveal vibrant, clean, natural lighting and true-to-life colors without breaking post-processing passes or weather effects.
@@ -147,12 +152,12 @@ Based on empirical testing on the ThinkPad X270, here are the minimum and recomm
 No terminal expertise required. Installing is completely automated:
 
 ### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.8_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
+Download the latest **`nfsmw-linux_0.1.9_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
 
 * **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
 * **Terminal Option**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.8_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.9_amd64.deb
   ```
 
 All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
@@ -225,7 +230,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.8_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.9_amd64.deb`.
 
 ---
 
@@ -235,7 +240,7 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.8_amd64.deb`
 * **Cause**: Stub symbol conflicts between the host library and the linker on certain systems.
 * **Fix**: All input and host telemetry stubs are baked internally directly into `libnfsmw_host.a` with *weak symbols* and the linker flag `--allow-multiple-definition`. Just install the update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.8_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.9_amd64.deb
   nfsmw-linux --rebuild
   ```
 

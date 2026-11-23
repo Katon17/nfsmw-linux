@@ -264,8 +264,6 @@ constexpr Row kGraphicsRows[] = {
     {Kind::Value, kMaxFps, "MAX FRAME RATE"},
     {Kind::Value, kFpsCounter, "FPS COUNTER"},
     {Kind::Value, kFpsPosition, "FPS COUNTER POSITION"},
-    {Kind::Value, kFpsUsage, "SHOW CPU / GPU USAGE"},
-    {Kind::Value, kFpsTemps, "SHOW TEMPERATURES"},
     {Kind::Heading, -1, "QUALITY"},
     {Kind::Value, kAniso, "ANISOTROPIC FILTERING"},
     {Kind::Value, kAntiAliasing, "ANTI-ALIASING"},
