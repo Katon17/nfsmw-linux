@@ -395,11 +395,11 @@ void Dispatch(const SDL_Event& e) {
 }  // namespace
 
 int main(int, char**) {
-    SDL_SetAppMetadata("Black (Linux)", "1.0", "io.github.blacklinux.Black");
+    SDL_SetAppMetadata("Need for Speed: Most Wanted (Black Edition)", "0.1.9", "nfsmw-linux");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");
-    SDL_SetHint(SDL_HINT_APP_ID, "black-linux");  // the .desktop file's name: the panel shows its icon
+    SDL_SetHint(SDL_HINT_APP_ID, "nfsmw-linux");  // the .desktop file's name: the panel shows its icon
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO)) {
         std::fprintf(stderr, "SDL_Init: %s\n", SDL_GetError());
         return 1;

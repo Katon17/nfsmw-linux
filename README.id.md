@@ -53,6 +53,9 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 ## 🆕 Yang Baru & Changelog
 
 ### Versi 0.1.9 (Terbaru)
+- **Ikon Baru Aplikasi Desktop (Logo Graffiti NFS Most Wanted + Tux Linux)**:
+  - Memperbarui ikon peluncur desktop (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, dan multi-resolusi PNG hingga 512×512) dengan karya seni logo graffiti Need for Speed: Most Wanted berlatar plat gelap dan maskot Tux the Linux Penguin.
+  - Memperbaiki `SDL_HINT_APP_ID` menjadi `nfsmw-linux` sehingga panel dan taskbar desktop (XFCE, Linux Mint, Ubuntu) langsung mengenali serta menampilkan ikon resmi aplikasi.
 - **Pembersihan Menu Grafis (Menghilangkan Opsi Telemetri Non-Fungsional)**:
   - Menghilangkan opsi **"SHOW CPU / GPU USAGE"** dan **"SHOW TEMPERATURES"** dari menu pengaturan Graphics in-game serta overlay F10.
   - Kedua opsi tersebut merupakan fitur bawaan Android yang tidak memiliki indikator/fungsi di desktop Linux, sehingga menu pengaturan grafis kini menjadi lebih ringkas, bersih, dan bebas dari opsi dummy.

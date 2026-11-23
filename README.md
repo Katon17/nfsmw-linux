@@ -53,6 +53,9 @@ Traditional methods for running classic console games on Linux suffer from sever
 ## 🆕 What's New & Changelog
 
 ### Version 0.1.9 (Latest)
+- **New Desktop Application Icon (NFS Most Wanted Graffiti Logo + Linux Tux)**:
+  - Replaced the desktop launcher icon (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, and high-resolution icons up to 512x512) with the iconic Need for Speed: Most Wanted graffiti artwork on a dark carbon plate featuring Tux the Linux Penguin.
+  - Fixed `SDL_HINT_APP_ID` to `nfsmw-linux` so desktop panels, window managers (XFWM4, Muffin, Mutter), and taskbars immediately display the custom icon.
 - **Cleaned Up Graphics Menu (Removed Non-Functional Telemetry Options)**:
   - Removed **"SHOW CPU / GPU USAGE"** and **"SHOW TEMPERATURES"** from the in-game **Graphics** options and the F10 overlay menu.
   - These entries were legacy mobile Android holdovers whose Linux desktop stubs had no visible telemetry indicators, streamlining the graphics menu into a clean, functional layout.

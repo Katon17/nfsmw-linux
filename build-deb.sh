@@ -52,6 +52,14 @@ fi
 # 5. Desktop shortcuts and application icon
 install -m 644 packaging/nfsmw-linux.desktop "$PKG/usr/share/applications/"
 install -m 644 packaging/nfsmw-linux.svg "$PKG/usr/share/icons/hicolor/scalable/apps/"
+mkdir -p "$PKG/usr/share/pixmaps"
+install -m 644 packaging/nfsmw-linux.png "$PKG/usr/share/pixmaps/nfsmw-linux.png"
+for sz in 16 32 48 64 128 256 512; do
+    if [ -f "packaging/icons/${sz}x${sz}/nfsmw-linux.png" ]; then
+        mkdir -p "$PKG/usr/share/icons/hicolor/${sz}x${sz}/apps"
+        install -m 644 "packaging/icons/${sz}x${sz}/nfsmw-linux.png" "$PKG/usr/share/icons/hicolor/${sz}x${sz}/apps/"
+    fi
+done
 
 # 6. Documentation and licenses
 install -m 644 packaging/README.Debian "$PKG/usr/share/doc/nfsmw-linux/README"
