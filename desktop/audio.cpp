@@ -40,9 +40,9 @@ void Fold(const float* in, uint32_t frames, bool mono, std::vector<float>& out) 
     }
 }
 
-// Target 40 ms queue cushion in SDL_AudioStream to completely absorb scheduling jitter and prevent buffer underruns
-constexpr int kCushionFrames = (kRate * 4) / 100;                  // 40 ms = 1920 frames
-constexpr int kCushionBytes = kCushionFrames * 2 * sizeof(float);  // 15,360 bytes
+// Target 60 ms queue cushion in SDL_AudioStream to completely absorb scheduling jitter and prevent buffer underruns
+constexpr int kCushionFrames = (kRate * 6) / 100;                  // 60 ms = 2880 frames
+constexpr int kCushionBytes = kCushionFrames * 2 * sizeof(float);  // 23,040 bytes
 
 void SDLCALL Feed(void* user, SDL_AudioStream* stream, int additional, int) {
     auto& p = *static_cast<Pump*>(user);
@@ -91,8 +91,8 @@ void StartOutput(std::function<void(float*, uint32_t)> render) {
     }
     LOGI("audio: %s output through %s", IsSurround() ? "5.1 folded to stereo" : "stereo", SDL_GetCurrentAudioDriver());
 
-    // Pre-fill stream with 40 ms cushion so audio starts smoothly without an initial underrun pop
-    for (int i = 0; i < 4; i++) {
+    // Pre-fill stream with 60 ms cushion so audio starts smoothly without an initial underrun pop
+    for (int i = 0; i < 6; i++) {
         pump->render(pump->mix.data(), kBlock);
         Fold(pump->mix.data(), kBlock, g_mode == kOutputMono, pump->out);
         SDL_PutAudioStreamData(g_stream, pump->out.data(), int(pump->out.size() * sizeof(float)));
