@@ -9,6 +9,7 @@
 
 #include "cpu/x86_ops.h"
 #include "kernel/kernel.h"
+#include "kernel/memory.h"
 
 namespace {
 
@@ -58,6 +59,7 @@ X86_FUNC(sub_002D6D40) {
     using kernel::R32;
     uint32_t mask = R32(ctx.esp + 4);
     int8_t level = int8_t(kernel::G<uint8_t>(ctx.esp + 8));
+    ctx.esp += 4;
     if (!(kernel::CallGuest(ctx, 0x2D2EA0, {}) & 0xFF)) {
         ctx.eax = 0xFFFFFFEE;
         return;
@@ -68,18 +70,22 @@ X86_FUNC(sub_002D6D40) {
     uint32_t result = 0xFFFFFFF8;
     for (uint32_t group = 0; group < 4; group++) {
         if (!kernel::CallGuest(ctx, 0x2D7A60, {group, mask})) continue;
+        uint32_t group_ptr = R32(0x4E3AFC);
+        if (!group_ptr || !mem::IsCommitted(group_ptr)) continue;
         for (uint32_t i = 0; i < 24; i++) {
-            uint32_t ch = R32(R32(0x4E3AFC) + 0x40 + i * 4);
-            if (!ch || !(mask & (1u << i))) continue;
+            uint32_t ch = R32(group_ptr + 0x40 + i * 4);
+            if (!ch || !mem::IsCommitted(ch) || !(mask & (1u << i))) continue;
             kernel::G<uint8_t>(ch + 2) = uint8_t(level);
             result = 0;
             if (int16_t(kernel::R16(ch + 0x1A)) >= 0) continue;
             uint32_t stream = R32(ch + 0x12C);
-            if (!stream) continue;
+            if (!stream || !mem::IsCommitted(stream)) continue;
+            uint32_t vtable = R32(stream);
+            if (!vtable || !mem::IsCommitted(vtable)) continue;
             int32_t v = int32_t(int8_t(kernel::G<uint8_t>(ch + 3))) * level / 100;
             uint32_t ecx = ctx.ecx;
             ctx.ecx = stream;
-            kernel::CallGuest(ctx, R32(R32(stream) + 0x30), {uint32_t(v)});
+            kernel::CallGuest(ctx, R32(vtable + 0x30), {uint32_t(v)});
             ctx.ecx = ecx;
         }
     }
