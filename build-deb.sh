@@ -128,7 +128,11 @@ chmod 755 "$PKG/DEBIAN/postrm"
 
 mkdir -p "$OUTDIR"
 find "$PKG" -type d -exec chmod 755 {} \;
-fakeroot dpkg-deb --build -Zxz "$PKG" "$OUTDIR/nfsmw-linux_${VERSION}_amd64.deb"
+if command -v fakeroot >/dev/null 2>&1; then
+    fakeroot dpkg-deb --build -Zxz "$PKG" "$OUTDIR/nfsmw-linux_${VERSION}_amd64.deb"
+else
+    dpkg-deb --root-owner-group --build -Zxz "$PKG" "$OUTDIR/nfsmw-linux_${VERSION}_amd64.deb"
+fi
 rm -rf "$(dirname "$PKG")"
 
 echo ""

@@ -6,8 +6,29 @@
 #   nfsmw-linux [--windowed] [--borderless] [--fullscreen] [--rebuild] [--change-iso]
 set -euo pipefail
 
-DATA="${NFSMW_DATA_DIR:-/usr/share/nfsmw-linux}"
-LIB="${NFSMW_LIB_DIR:-/usr/lib/nfsmw-linux}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Detect environment: AppImage ($APPDIR), Portable ($SCRIPT_DIR), or System (/usr)
+if [[ -n "${APPDIR:-}" && -d "$APPDIR/usr/share/nfsmw-linux" ]]; then
+    DEFAULT_DATA="$APPDIR/usr/share/nfsmw-linux"
+    DEFAULT_LIB="$APPDIR/usr/lib/nfsmw-linux"
+    BUILD_BIN="$APPDIR/usr/bin/nfsmw-linux-build"
+elif [[ -d "$SCRIPT_DIR/share/nfsmw-linux" && -d "$SCRIPT_DIR/lib/nfsmw-linux" ]]; then
+    DEFAULT_DATA="$SCRIPT_DIR/share/nfsmw-linux"
+    DEFAULT_LIB="$SCRIPT_DIR/lib/nfsmw-linux"
+    BUILD_BIN="$SCRIPT_DIR/bin/nfsmw-linux-build"
+elif [[ -d "$SCRIPT_DIR/share" && -d "$SCRIPT_DIR/lib" ]]; then
+    DEFAULT_DATA="$SCRIPT_DIR/share"
+    DEFAULT_LIB="$SCRIPT_DIR/lib"
+    BUILD_BIN="$SCRIPT_DIR/nfsmw-linux-build"
+else
+    DEFAULT_DATA="/usr/share/nfsmw-linux"
+    DEFAULT_LIB="/usr/lib/nfsmw-linux"
+    BUILD_BIN="nfsmw-linux-build"
+fi
+
+DATA="${NFSMW_DATA_DIR:-$DEFAULT_DATA}"
+LIB="${NFSMW_LIB_DIR:-$DEFAULT_LIB}"
 HOME_DIR="${NFSMW_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/nfsmw-linux}"
 VERSION="@VERSION@"
 
@@ -44,8 +65,10 @@ fi
 stamp_version=$(cut -d' ' -f1 "$HOME_DIR/bin/.stamp" 2>/dev/null || true)
 if [[ $REBUILD == 1 || $CHANGE_ISO == 1 || ! -x $HOME_DIR/bin/MOSTWANTED || $stamp_version != "$VERSION" ]]; then
     GUI_FLAG=""
-    command -v zenity >/dev/null 2>&1 && GUI_FLAG="--gui"
-    nfsmw-linux-build $GUI_FLAG $([[ $REBUILD == 1 || $CHANGE_ISO == 1 ]] && echo --force) || exit 1
+    if command -v zenity >/dev/null 2>&1 || command -v kdialog >/dev/null 2>&1; then
+        GUI_FLAG="--gui"
+    fi
+    "$BUILD_BIN" $GUI_FLAG $([[ $REBUILD == 1 || $CHANGE_ISO == 1 ]] && echo --force) || exit 1
 fi
 
 if [[ ! -x $HOME_DIR/bin/MOSTWANTED ]]; then

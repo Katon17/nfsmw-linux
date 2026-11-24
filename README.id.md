@@ -53,6 +53,12 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 ## 🆕 Yang Baru & Changelog
 
 ### Versi 0.1.13 (Terbaru)
+- **Dukungan Penuh Valve Steam Deck & Distro Non-Debian (AppImage & Portable Tarball)**:
+  - Menyediakan format berkas mandiri **`nfsmw-linux_0.1.13_x86_64.AppImage`** yang dapat langsung ditambahkan ke Steam sebagai *Non-Steam Game* di Desktop Mode dan dimainkan langsung di Gaming Mode.
+  - Menyediakan arsip **`nfsmw-linux_0.1.13_portable.tar.gz`** untuk instalasi mandiri di folder game pengguna tanpa memerlukan akses root (`sudo`).
+  - Mendukung antarmuka pemilihan file via **KDialog** (lingkungan desktop KDE Plasma / Steam Deck) selain Zenity.
+  - Skrip builder otomatis mengenali package manager `pacman` (Arch/SteamOS), `dnf` (Fedora), dan `apt` (Debian/Ubuntu) serta mendeteksi compiler `clang++` maupun `g++` secara dinamis.
+  - Panduan lengkap khusus Steam Deck tersedia di [README-STEAM-DECK.md](README-STEAM-DECK.md).
 - **Perbaikan Crash Game (Restore Return Address `ctx.esp += 4` & Defensive Memory Checks)**:
   - Mengembalikan instruksi `ctx.esp += 4` pada fungsi pengatur volume stream `sub_002D6D40` di `src/game/game_threads.cpp`. Penghapusan instruksi ini sebelumnya merusak stack alignment saat EA Trax mengatur volume musik, mengakibatkan crash / SIGSEGV.
   - Menambahkan pengamanan memori `mem::IsCommitted` pada audio group pointer, channel, stream, dan vtable di `sub_002D6D40` untuk mencegah dereference pointer liar saat transisi audio game.

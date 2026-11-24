@@ -53,6 +53,12 @@ Traditional methods for running classic console games on Linux suffer from sever
 ## 🆕 What's New & Changelog
 
 ### Version 0.1.13 (Latest)
+- **Official Valve Steam Deck & Non-Debian Support (AppImage & Portable Tarball)**:
+  - Added standalone **`nfsmw-linux_0.1.13_x86_64.AppImage`** that can be added directly to Steam as a *Non-Steam Game* in Desktop Mode and launched seamlessly in Gaming Mode with full internal gamepad detection.
+  - Added standalone **`nfsmw-linux_0.1.13_portable.tar.gz`** for running out of a user folder without root (`sudo`) or `dpkg` permissions.
+  - Added **KDialog** support for native file selection on KDE Plasma / SteamOS Desktop Mode in addition to Zenity.
+  - Builder script dynamically detects `pacman` (Arch/SteamOS), `dnf` (Fedora), and `apt` (Debian/Ubuntu) package managers, and auto-detects `clang++` or `g++`.
+  - Comprehensive Steam Deck guide available at [README-STEAM-DECK.md](README-STEAM-DECK.md).
 - **Fix Game Crash (Restore Stack Pointer `ctx.esp += 4` & Defensive Memory Checks)**:
   - Restored `ctx.esp += 4` inside audio stream volume routine `sub_002D6D40` in `src/game/game_threads.cpp`. Removing this instruction previously prevented the recompiled caller from properly cleaning up the return address on stack, causing stack misalignment and immediate crash / SIGSEGV upon EA Trax music volume changes.
   - Added strict memory commitment verification (`mem::IsCommitted`) on audio group pointers, channels, streams, and vtables to safeguard against wild pointer dereferences.

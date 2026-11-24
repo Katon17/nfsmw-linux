@@ -15,13 +15,46 @@
 set -euo pipefail
 
 VERSION="@VERSION@"
-DATA="${NFSMW_DATA_DIR:-/usr/share/nfsmw-linux}"
-LIB="${NFSMW_LIB_DIR:-/usr/lib/nfsmw-linux}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Detect environment: AppImage ($APPDIR), Portable ($SCRIPT_DIR), or System (/usr)
+if [[ -n "${APPDIR:-}" && -d "$APPDIR/usr/share/nfsmw-linux" ]]; then
+    DEFAULT_DATA="$APPDIR/usr/share/nfsmw-linux"
+    DEFAULT_LIB="$APPDIR/usr/lib/nfsmw-linux"
+elif [[ -d "$SCRIPT_DIR/share/nfsmw-linux" && -d "$SCRIPT_DIR/lib/nfsmw-linux" ]]; then
+    DEFAULT_DATA="$SCRIPT_DIR/share/nfsmw-linux"
+    DEFAULT_LIB="$SCRIPT_DIR/lib/nfsmw-linux"
+elif [[ -d "$SCRIPT_DIR/share" && -d "$SCRIPT_DIR/lib" ]]; then
+    DEFAULT_DATA="$SCRIPT_DIR/share"
+    DEFAULT_LIB="$SCRIPT_DIR/lib"
+else
+    DEFAULT_DATA="/usr/share/nfsmw-linux"
+    DEFAULT_LIB="/usr/lib/nfsmw-linux"
+fi
+
+DATA="${NFSMW_DATA_DIR:-$DEFAULT_DATA}"
+LIB="${NFSMW_LIB_DIR:-$DEFAULT_LIB}"
 HOME_DIR="${NFSMW_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/nfsmw-linux}"
 WORK="${XDG_CACHE_HOME:-$HOME/.cache}/nfsmw-linux"
 USA_BLACK_SHA1="f636a16af04171089f879a4bed646e185c734233"
-CXX="${CXX:-clang++}"
 MARCH="@MARCH@"
+
+# Compiler detection: prefer clang++, fallback to g++
+if [[ -z "${CXX:-}" ]]; then
+    if command -v clang++ >/dev/null 2>&1; then
+        CXX="clang++"
+    elif command -v g++ >/dev/null 2>&1; then
+        CXX="g++"
+    else
+        CXX="clang++"
+    fi
+fi
+
+# Linker detection: prefer lld, fallback to system ld
+LLD_FLAG="-fuse-ld=lld"
+if ! command -v ld.lld >/dev/null 2>&1; then
+    LLD_FLAG=""
+fi
 
 GUI=0; JOBS=""; FORCE=0; SOURCE=""
 while (($#)); do
@@ -35,9 +68,11 @@ while (($#)); do
     shift
 done
 
-# If stdout is not a terminal, enable GUI automatically if zenity is installed
-if [[ $GUI == 0 ]] && ! [[ -t 1 ]] && command -v zenity >/dev/null 2>&1; then
-    GUI=1
+# If stdout is not a terminal, enable GUI automatically if zenity or kdialog is installed
+if [[ $GUI == 0 ]] && ! [[ -t 1 ]]; then
+    if command -v zenity >/dev/null 2>&1 || command -v kdialog >/dev/null 2>&1; then
+        GUI=1
+    fi
 fi
 
 say() { echo "  $*"; }
@@ -47,8 +82,12 @@ fail() {
     echo -e "  ERROR: $*"
     echo "  ========================================================"
     echo ""
-    if [[ $GUI == 1 ]] && command -v zenity >/dev/null 2>&1; then
-        zenity --error --title="Need for Speed: Most Wanted (Black Edition)" --width=520 --text="$*" 2>/dev/null || true
+    if [[ $GUI == 1 ]]; then
+        if command -v zenity >/dev/null 2>&1; then
+            zenity --error --title="Need for Speed: Most Wanted (Black Edition)" --width=520 --text="$*" 2>/dev/null || true
+        elif command -v kdialog >/dev/null 2>&1; then
+            kdialog --error "$*" --title "Need for Speed: Most Wanted (Black Edition)" 2>/dev/null || true
+        fi
     fi
     exit 1
 }
@@ -60,19 +99,36 @@ LOG="$WORK/build.log"
 echo ""
 echo "  ======================================================================"
 echo "    Need for Speed: Most Wanted Black Edition - Native Linux Builder"
-echo "    Version ${VERSION} | Arch: ${MARCH}"
+echo "    Version ${VERSION} | Arch: ${MARCH} | Compiler: ${CXX}"
 echo "  ======================================================================"
 echo ""
 
 # ------------------------------------------------------------------ Toolchain check
-for t in "$CXX" ld.lld python3; do
-    command -v "$t" >/dev/null 2>&1 || fail "$t is missing. Install via:\n  sudo apt install clang lld python3"
-done
+MISSING_TOOLS=()
+command -v "$CXX" >/dev/null 2>&1 || MISSING_TOOLS+=("$CXX")
+command -v python3 >/dev/null 2>&1 || MISSING_TOOLS+=("python3")
+
+if [[ ${#MISSING_TOOLS[@]} -gt 0 ]]; then
+    if command -v pacman >/dev/null 2>&1; then
+        fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Arch Linux / Steam Deck, instal via:\n  sudo pacman -S clang lld python"
+    elif command -v dnf >/dev/null 2>&1; then
+        fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Fedora / Nobara, instal via:\n  sudo dnf install clang lld python3"
+    else
+        fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Ubuntu / Linux Mint / Debian, instal via:\n  sudo apt install clang lld python3"
+    fi
+fi
+
 VK=""
-for f in /usr/lib/x86_64-linux-gnu/libvulkan.so.1 /usr/lib64/libvulkan.so.1 /usr/lib/libvulkan.so.1; do
+for f in /usr/lib/x86_64-linux-gnu/libvulkan.so.1 /usr/lib64/libvulkan.so.1 /usr/lib/libvulkan.so.1 /usr/lib/libvulkan.so; do
     [[ -e $f ]] && VK="$f" && break
 done
-[[ -n $VK ]] || fail "libvulkan.so.1 is missing. Install via:\n  sudo apt install libvulkan1 mesa-vulkan-drivers"
+if [[ -z $VK ]]; then
+    if command -v pacman >/dev/null 2>&1; then
+        fail "libvulkan.so.1 tidak ditemukan. Pada Arch Linux / Steam Deck, instal via:\n  sudo pacman -S vulkan-icd-loader"
+    else
+        fail "libvulkan.so.1 is missing. Install via:\n  sudo apt install libvulkan1 mesa-vulkan-drivers"
+    fi
+fi
 
 # ------------------------------------------------------------------ Locate or Pick Game Copy
 find_game_auto() {
@@ -105,6 +161,14 @@ while true; do
                 --title="Pilih File ISO Need for Speed: Most Wanted (Black Edition)" \
                 --file-filter="Xbox Game ISO (*.iso, default.xbe) | *.iso *.ISO *.xiso.iso default.xbe DEFAULT.XBE" \
                 2>/dev/null || true)
+            if [[ -z $PICK ]]; then
+                echo "Pemilihan file dibatalkan oleh pengguna."
+                exit 0
+            fi
+            GAME_FILE="$PICK"
+        elif command -v kdialog >/dev/null 2>&1; then
+            PICK=$(kdialog --getopenfilename "$HOME" "*.iso *.ISO *.xiso.iso default.xbe DEFAULT.XBE|Xbox Game ISO (*.iso, default.xbe)" \
+                --title "Pilih File ISO Need for Speed: Most Wanted (Black Edition)" 2>/dev/null || true)
             if [[ -z $PICK ]]; then
                 echo "Pemilihan file dibatalkan oleh pengguna."
                 exit 0
@@ -299,7 +363,7 @@ for s in "${SOURCES[@]:1}"; do
     OBJS+=("$OBJ/$(basename "$s" .cpp).o")
 done
 
-$CXX -fuse-ld=lld -Wl,--allow-multiple-definition -o "$HOME_DIR/bin/MOSTWANTED.new" \
+$CXX $LLD_FLAG -Wl,--allow-multiple-definition -o "$HOME_DIR/bin/MOSTWANTED.new" \
     "${OBJS[@]}" "$WORK/image_sha1.o" "$WORK/host_stubs.o" \
     -Wl,--whole-archive "$LIB/libnfsmw_host.a" -Wl,--no-whole-archive \
     -Wl,--start-group $(grep '\.a$' "$LIB/link-libs.txt" 2>/dev/null | sed "s|^|$LIB/|") -Wl,--end-group \
