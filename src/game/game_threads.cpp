@@ -58,7 +58,6 @@ X86_FUNC(sub_002D6D40) {
     using kernel::R32;
     uint32_t mask = R32(ctx.esp + 4);
     int8_t level = int8_t(kernel::G<uint8_t>(ctx.esp + 8));
-    ctx.esp += 4;
     if (!(kernel::CallGuest(ctx, 0x2D2EA0, {}) & 0xFF)) {
         ctx.eax = 0xFFFFFFEE;
         return;

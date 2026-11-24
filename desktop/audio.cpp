@@ -63,6 +63,7 @@ void StartOutput(std::function<void(float*, uint32_t)> render) {
         LOGE("audio: SDL audio unavailable, no sound: %s", SDL_GetError());
         return;
     }
+    SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, "1024");
     SDL_AudioSpec spec{SDL_AUDIO_F32, 2, int(kRate)};
     // Open stream WITHOUT callback: we feed it from our own dedicated thread, decoupling
     // DirectSound mixing and g_lock contention from OS real-time audio driver deadlines.

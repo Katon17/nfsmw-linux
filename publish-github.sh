@@ -13,14 +13,16 @@ fi
 git config user.name "Katon Bagaskoro"
 git config user.email "katon@thinkpad.local"
 
+VERSION="$(cat VERSION | tr -d '[:space:]')"
+
 if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
     echo "Creating initial commit..."
     git add .
-    git commit -m "feat: initial release v0.1.4 of Need for Speed: Most Wanted (Black Edition) native Linux port"
+    git commit -m "feat: initial release v${VERSION} of Need for Speed: Most Wanted (Black Edition) native Linux port"
 elif [[ -n $(git status --porcelain) ]]; then
     echo "Committing pending changes..."
     git add .
-    git commit -m "update: latest fixes and enhancements v0.1.9"
+    git commit -m "update: latest fixes and enhancements v${VERSION}"
 fi
 
 if git remote | grep -q origin; then
@@ -39,7 +41,7 @@ echo "Jalankan perintah ini untuk push ke GitHub:"
 echo "  git push -u origin main"
 echo ""
 echo "Lalu upload release installer .deb via GitHub CLI (jika gh terpasang):"
-echo "  gh release create v0.1.9 release/nfsmw-linux_0.1.9_amd64.deb \\"
-echo "    --title \"Need for Speed: Most Wanted (Black Edition) v0.1.9\" \\"
-echo "    --notes \"Native Linux (x86_64) port. Cleaned up Graphics menu by removing non-functional CPU/GPU usage and temperature telemetry options, verified 60+ FPS on ThinkPad X270. Maintained by Katon Bagaskoro.\""
+echo "  gh release create v${VERSION} release/nfsmw-linux_${VERSION}_amd64.deb release/nfsmw-linux_${VERSION}.tar.gz \\"
+echo "    --title \"Need for Speed: Most Wanted (Black Edition) v${VERSION}\" \\"
+echo "    --notes \"Native Linux (x86_64) port. Verified crystal-clear audio on ThinkPad X270 with automatic PulseAudio driver configuration, eliminating low-quantum buffer underruns on Linux Mint 22 / Ubuntu 24.04. Maintained by Katon Bagaskoro.\""
 echo "======================================================================"

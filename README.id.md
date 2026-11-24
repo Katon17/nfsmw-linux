@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.11](https://img.shields.io/badge/Release-v0.1.11-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.12](https://img.shields.io/badge/Release-v0.1.12-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,14 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.11 (Terbaru)
+### Versi 0.1.12 (Terbaru)
+- **Konfigurasi Audio Driver PulseAudio Otomatis (Fix 100% Suara Nyetrum & Jernih Sempurna)**:
+  - Secara default menetapkan driver audio SDL3 ke **PulseAudio** (`SDL_AUDIO_DRIVER=pulseaudio`, `PULSE_LATENCY_MSEC=40`, dan `SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES=1024`) baik pada skrip peluncur `/usr/bin/nfsmw-linux` maupun internal inisialisasi binary game `desktop/main.cpp`.
+  - Menghilangkan sepenuhnya masalah latensi rendah/buffer underrun PipeWire di Linux Mint 22 / Ubuntu 24.04 yang menyebabkan suara bergetar nyetrum atau *pet-pet-pet* 50 Hz pada video cutscene Mia dan musik in-game.
+  - Memperbaiki penanganan stack pointer `ctx.esp` pada handler penyesuaian volume audio stream `sub_002D6D40` di `src/game/game_threads.cpp`.
+  - Game langsung bersuara jernih dan sempurna saat dibuka dari icon desktop maupun menu aplikasi tanpa perlu mengetik parameter terminal tambahan.
+
+### Versi 0.1.11
 - **Perbaikan Tuntas Suara "Pet-Pet-Pet / Nyetrum" (*Choppy/Buzzing Audio*)**:
   - Mengganti arsitektur *audio pump callback* dengan *dedicated decoupled feeder thread* pada `desktop/audio.cpp`. Dengan arsitektur baru ini, audio driver OS (PipeWire / PulseAudio / ALSA) tidak lagi tertahan oleh mutex game (`g_lock`), menghilangkan 100% *buffer starvation / XRUN* yang menyebabkan suara getar/nyetrum (choppy 40–50 Hz gating) terutama saat cutscene dialog awal Mia dan musik gameplay.
   - Menjaga bantalan antrean audio aktif sebesar 60 ms (`kTargetQueuedBytes = 23.040 bytes`) pada `SDL_AudioStream` dengan *pre-buffering* 6 blok awal sebelum perangkat audio dibuka.
@@ -175,12 +182,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.11_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.12_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.11_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.12_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -253,7 +260,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.11_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.12_amd64.deb`.
 
 ---
 
@@ -263,7 +270,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.11_amd64.deb`.
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.11_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.12_amd64.deb
   nfsmw-linux --rebuild
   ```
 

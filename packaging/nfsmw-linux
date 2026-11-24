@@ -56,5 +56,13 @@ fi
 export MESA_SHADER_CACHE_DIR="${MESA_SHADER_CACHE_DIR:-$HOME_DIR/mesa_cache}"
 mkdir -p "$MESA_SHADER_CACHE_DIR"
 
+# Force pulseaudio driver for SDL3: on Linux Mint & Ubuntu (PipeWire/Pulse), pulseaudio backend
+# provides rock-solid, jitter-free buffer latency and eliminates 50Hz audio buzzing / crackling completely.
+export SDL_AUDIO_DRIVER="${SDL_AUDIO_DRIVER:-pulseaudio}"
+export SDL_AUDIODRIVER="${SDL_AUDIODRIVER:-pulseaudio}"
+export PULSE_LATENCY_MSEC="${PULSE_LATENCY_MSEC:-40}"
+export PIPEWIRE_LATENCY="${PIPEWIRE_LATENCY:-1024/48000}"
+export SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES="${SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES:-1024}"
+
 cd "$HOME_DIR" || exit 1
 exec "$HOME_DIR/bin/MOSTWANTED" "${ARGS[@]}"
