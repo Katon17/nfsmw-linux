@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.9](https://img.shields.io/badge/Release-v0.1.9-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.10](https://img.shields.io/badge/Release-v0.1.10-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,17 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.9 (Terbaru)
+### Versi 0.1.10 (Terbaru)
+- **Perbaikan Bug Stuck Loading Setelah Selesai Balapan Career (Fix 7% CPU Usage Hang)**:
+  - Memperbaiki race condition threading di mana 3 thread I/O job worker dan main thread mengakses file handle arsip `ZZDATA` secara bersamaan tanpa sinkronisasi (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`). Sebelumnya, hal ini menyebabkan offset baca file tertimpa, menghasilkan data chunk corrupt pada chunk loader (`0x1C0460`), dan membuat 1 core prosesor terjebak dalam infinite loop (7% CPU usage di task manager) dengan layar macet di "Loading..." setelah menyelesaikan race di Career mode.
+  - Menambahkan penguncian mutex rekursif pada pool alokasi memori EA (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) untuk mencegah rusaknya pointer free list saat file dibuka-tutup secara cepat saat transisi event.
+  - Memperbaiki potensi freeze/crash volume audio stream (`sub_002D6D40`) saat keluar dari balapan.
+  - Memperbaiki race condition pada EA file stream reader (`sub_00087A40`) agar pemutaran video cutscene/FMV transisi berjalan stabil tanpa SIGSEGV.
+  - Menambahkan proteksi hash user profile save (`sub_00147600`) agar file save Career tidak ditolak sebagai corrupt/damaged.
+  - Mengaktifkan rendering full-frame pada front-end (`FullFrameFrontEnd()`) untuk menghilangkan border hitam TV overscan pada layar loading.
+  - Meningkatkan batas memori fisik guest dari 64 MB menjadi 128 MB (`kPhysicalSize`) guna mencegah kehabisan memori streaming aset dunia balap.
+
+### Versi 0.1.9
 - **Ikon Baru Aplikasi Desktop (Logo Graffiti NFS Most Wanted + Tux Linux)**:
   - Memperbarui ikon peluncur desktop (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, dan multi-resolusi PNG hingga 512×512) dengan karya seni logo graffiti Need for Speed: Most Wanted berlatar plat gelap dan maskot Tux the Linux Penguin.
   - Memperbaiki `SDL_HINT_APP_ID` menjadi `nfsmw-linux` sehingga panel dan taskbar desktop (XFCE, Linux Mint, Ubuntu) langsung mengenali serta menampilkan ikon resmi aplikasi.
@@ -155,12 +165,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.9_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.10_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.9_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.10_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -233,7 +243,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.9_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.10_amd64.deb`.
 
 ---
 
@@ -243,7 +253,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.9_amd64.deb`.
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.9_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.10_amd64.deb
   nfsmw-linux --rebuild
   ```
 

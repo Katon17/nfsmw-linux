@@ -77,14 +77,20 @@ target_link_libraries(xbe_symbols PRIVATE Zydis tomlplusplus::tomlplusplus)
 
 # ------------------------------------------------------------------ image_symbols.h
 set(HDR ${CMAKE_CURRENT_BINARY_DIR}/image_header)
-add_custom_command(OUTPUT ${HDR}/image_symbols.h
-    COMMAND ${CMAKE_COMMAND} -E env XBE_HEADER_ONLY=1 $<TARGET_FILE:xbe_recomp> ${REPO}/config/game.toml
-            ${REPO}/assets/default.xbe ${HDR} --xdk ${SDK}/xdk
-    DEPENDS xbe_recomp ${REPO}/config/game.toml
-    COMMENT "generating image_symbols.h from config/game.toml")
-add_custom_target(image_header DEPENDS ${HDR}/image_symbols.h)
+file(MAKE_DIRECTORY ${HDR})
+if(EXISTS ${REPO}/packaging/image_symbols.h)
+    configure_file(${REPO}/packaging/image_symbols.h ${HDR}/image_symbols.h COPYONLY)
+    add_custom_target(image_header DEPENDS ${HDR}/image_symbols.h)
+else()
+    add_custom_command(OUTPUT ${HDR}/image_symbols.h
+        COMMAND ${CMAKE_COMMAND} -E env XBE_HEADER_ONLY=1 $<TARGET_FILE:xbe_recomp> ${REPO}/config/game.toml
+                ${REPO}/assets/default.xbe ${HDR} --xdk ${SDK}/xdk
+        DEPENDS xbe_recomp ${REPO}/config/game.toml
+        COMMENT "generating image_symbols.h from config/game.toml")
+    add_custom_target(image_header DEPENDS ${HDR}/image_symbols.h)
+endif()
 
-set(BUILD_COMMIT "0.1.0")
+set(BUILD_COMMIT "0.1.10")
 file(CONFIGURE OUTPUT ${HDR}/build_info.h CONTENT "#define NFSMW_COMMIT \"linux-${BUILD_COMMIT}\"\n")
 
 # ------------------------------------------------------------------ Host static library

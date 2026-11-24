@@ -2,7 +2,7 @@
 
 🇮🇩 **Bahasa Indonesia**: lihat [README.id.md](README.id.md)
 
-[![Release: v0.1.9](https://img.shields.io/badge/Release-v0.1.9-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Release: v0.1.10](https://img.shields.io/badge/Release-v0.1.10-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,17 @@ Traditional methods for running classic console games on Linux suffer from sever
 
 ## 🆕 What's New & Changelog
 
-### Version 0.1.9 (Latest)
+### Version 0.1.10 (Latest)
+- **Fix Post-Race Career Track Loading Freeze / Hang (7% CPU Spinlock Fix)**:
+  - Resolved a critical thread race condition where multiple I/O worker threads and the main thread accessed the shared `ZZDATA` archive handle concurrently without synchronization (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`), which previously scrambled file read offsets, fed corrupt chunk headers to the chunk loader (`0x1C0460`), and caused an infinite spin loop on 1 CPU core (~7% CPU usage on modern multi-core processors) leaving players stuck on the "Loading..." screen after completing a career track.
+  - Implemented recursive mutex synchronization for EA's slot pool allocator and free lists (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) to prevent cyclic linked-list corruption during rapid file open/close cycles between events.
+  - Fixed audio stream crash/stall in channel volume adjustments (`sub_002D6D40`) when leaving a race.
+  - Added thread-safe critical section wrapping to EA's file stream reader (`sub_00087A40`) to prevent race conditions during cutscene and FMV movie transitions.
+  - Added user profile save signature guard (`sub_00147600`) to prevent career save files from being rejected as damaged.
+  - Enabled full-frame front-end rendering (`FullFrameFrontEnd()`) to remove TV overscan black borders during loading screens.
+  - Expanded guest physical memory headroom from 64 MB to 128 MB (`kPhysicalSize`) to prevent out-of-memory stalls during high-density asset streaming.
+
+### Version 0.1.9
 - **New Desktop Application Icon (NFS Most Wanted Graffiti Logo + Linux Tux)**:
   - Replaced the desktop launcher icon (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, and high-resolution icons up to 512x512) with the iconic Need for Speed: Most Wanted graffiti artwork on a dark carbon plate featuring Tux the Linux Penguin.
   - Fixed `SDL_HINT_APP_ID` to `nfsmw-linux` so desktop panels, window managers (XFWM4, Muffin, Mutter), and taskbars immediately display the custom icon.
@@ -155,12 +165,12 @@ Based on empirical testing on the ThinkPad X270, here are the minimum and recomm
 No terminal expertise required. Installing is completely automated:
 
 ### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.9_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
+Download the latest **`nfsmw-linux_0.1.10_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
 
 * **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
 * **Terminal Option**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.9_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.10_amd64.deb
   ```
 
 All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
@@ -233,7 +243,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-The resulting package will be generated at `release/nfsmw-linux_0.1.9_amd64.deb`.
+The resulting package will be generated at `release/nfsmw-linux_0.1.10_amd64.deb`.
 
 ---
 
@@ -243,7 +253,7 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.9_amd64.deb`
 * **Cause**: Stub symbol conflicts between the host library and the linker on certain systems.
 * **Fix**: All input and host telemetry stubs are baked internally directly into `libnfsmw_host.a` with *weak symbols* and the linker flag `--allow-multiple-definition`. Just install the update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.9_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.10_amd64.deb
   nfsmw-linux --rebuild
   ```
 

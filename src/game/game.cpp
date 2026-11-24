@@ -16,7 +16,17 @@ namespace game {
 // gives the cameras (0x0D4888, 0x0D8330) a frame 853 wide (480 * 16 / 9, at 0x427C00) for a 4:3 one's 640. It is the
 // frame's own shape here, so 19.5:9 is not 16:9 stretched
 constexpr uint32_t kVideoFlags = 0x48099C, kWideWidth = 0x427C00;
+constexpr uint32_t kSafeWidth = 0x3D3534, kSafeHeight = 0x3D3530;
+void FullFrameFrontEnd() {
+    constexpr float kWidth = 640.0f, kHeight = 480.0f;
+    uint32_t w, h;
+    std::memcpy(&w, &kWidth, 4);
+    std::memcpy(&h, &kHeight, 4);
+    kernel::W32(kSafeWidth, w);
+    kernel::W32(kSafeHeight, h);
+}
 void WidenAspect() {
+    FullFrameFrontEnd();
     if (!(kernel::G<uint8_t>(kVideoFlags) & 1)) return;
     float w = 480.0f * Aspect();
     uint32_t bits;
@@ -188,6 +198,38 @@ X86_FUNC(sub_000C1BD0) {
     r = g = b = 0.299f * saved[0] + 0.587f * saved[1] + 0.114f * saved[2];
     __imp__sub_000C1BD0(ctx, base);
     r = saved[0], g = saved[1], b = saved[2];
+}
+
+// EA's file streams ("STRM", the system's handles 16 bytes each at +0x34): the stream thread hands a handle its data
+// in 0x871D0, under the system's critical section (+8, entered by 0x2BC401/left by 0x2BC40C with the system + 4),
+// adding to the bytes ready (+8) and then, from none, setting the first block (+0xC). The reader 0x87A40 (cdecl, the
+// handle) checks the bytes and takes the block before it enters the section: on a single core the window was
+// a few instructions, on multi-core PCs (and stores out of order) the movies read a block not set yet, 0xEEEEEEEE
+// from bMalloc's fill of a fresh handle, a SIGSEGV/hang as a movie started or stopped. The whole read holds the section
+// (recursive: the reader's own enter nests)
+X86_EXTERN_FUNC(__imp__sub_00087A40);
+X86_EXTERN_FUNC(sub_002BC401);
+X86_EXTERN_FUNC(sub_002BC40C);
+X86_FUNC(sub_00087A40) {
+    constexpr uint32_t kStrm = 0x4D525453;
+    uint32_t handle = kernel::R32(ctx.esp + 4);
+    uint32_t system = handle ? kernel::R32(handle) : 0;
+    if (!system || !mem::IsCommitted(system) || kernel::R32(system) != kStrm) return __imp__sub_00087A40(ctx, base);
+    ctx.ecx = system + 4;
+    X86_PUSH32(0);
+    sub_002BC401(ctx, base);
+    __imp__sub_00087A40(ctx, base);
+    uint32_t result = ctx.eax;
+    ctx.ecx = system + 4;
+    X86_PUSH32(0);
+    sub_002BC40C(ctx, base);
+    ctx.eax = result;
+}
+
+// the movie decoder's fetch of its stream's next block (thiscall, through the STRM reader 0x87A40), for every movie
+X86_EXTERN_FUNC(__imp__sub_002C020F);
+X86_FUNC(sub_002C020F) {
+    __imp__sub_002C020F(ctx, base);
 }
 
 X86_EXTERN_FUNC(__imp__sub_00116230);
