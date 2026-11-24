@@ -1,9 +1,11 @@
-// mixer output through an SDL audio stream (AAudio underneath): the 5.1 mix folded to the stereo pair Android plays
+// mixer output through an SDL audio stream: decoupled worker thread feeding 5.1 folded to stereo
 #include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 #include "audio/output.h"
@@ -14,48 +16,28 @@ namespace audio {
 namespace {
 
 constexpr float kCentreFold = 0.707f;
-constexpr uint32_t kBlock = kRate / 100;  // frames the mixer renders a call: 10 ms
+constexpr float kDownmixScale = 0.75f;    // headroom scaling to prevent flat-top clipping distortion
+constexpr uint32_t kBlock = kRate / 100;  // frames the mixer renders a call: 10 ms (480 frames)
+// 60 ms buffer cushion (2880 frames = 23,040 bytes)
+constexpr int kTargetQueuedBytes = (int(kRate) * 6 / 100) * 2 * int(sizeof(float));
 
 std::atomic<uint32_t> g_mode{kOutputAuto};
 std::atomic<bool> g_paused{false};
+std::atomic<bool> g_running{false};
 SDL_AudioStream* g_stream = nullptr;
+std::thread g_audio_thread;
 
-struct Pump {
-    std::function<void(float*, uint32_t)> render;
-    std::vector<float> mix = std::vector<float>(kBlock * kChannels);
-    std::vector<float> out;  // stereo frames rendered, not yet handed to SDL
-};
-
-// L = FL + kCentreFold C + BL and R = FR + kCentreFold C + BR without the sub; mono hears the average of the two.
+// L = (FL + 0.707 C + 0.707 BL) * scale and R = (FR + 0.707 C + 0.707 BR) * scale.
 // Clamped to [-1.0f, 1.0f] to prevent integer wrap-around and DAC digital clipping on loud voice/sound transients.
 void Fold(const float* in, uint32_t frames, bool mono, std::vector<float>& out) {
     for (uint32_t i = 0; i < frames; i++) {
         const float* f = in + size_t(i) * kChannels;
         float c = f[Centre] * kCentreFold;
-        float l = f[FrontLeft] + c + f[BackLeft] * kCentreFold;
-        float r = f[FrontRight] + c + f[BackRight] * kCentreFold;
+        float l = (f[FrontLeft] + c + f[BackLeft] * kCentreFold) * kDownmixScale;
+        float r = (f[FrontRight] + c + f[BackRight] * kCentreFold) * kDownmixScale;
         if (mono) l = r = (l + r) * 0.5f;
         out.push_back(std::clamp(l, -1.0f, 1.0f));
         out.push_back(std::clamp(r, -1.0f, 1.0f));
-    }
-}
-
-// Target 60 ms queue cushion in SDL_AudioStream to completely absorb scheduling jitter and prevent buffer underruns
-constexpr int kCushionFrames = (kRate * 6) / 100;                  // 60 ms = 2880 frames
-constexpr int kCushionBytes = kCushionFrames * 2 * sizeof(float);  // 23,040 bytes
-
-void SDLCALL Feed(void* user, SDL_AudioStream* stream, int additional, int) {
-    auto& p = *static_cast<Pump*>(user);
-    int queued = std::max(0, SDL_GetAudioStreamQueued(stream));
-    int needed = std::max(0, additional) + std::max(0, kCushionBytes - queued);
-
-    while (needed > 0) {
-        p.render(p.mix.data(), kBlock);
-        Fold(p.mix.data(), kBlock, g_mode == kOutputMono, p.out);
-        int bytes = int(p.out.size() * sizeof(float));
-        SDL_PutAudioStreamData(stream, p.out.data(), bytes);
-        needed -= bytes;
-        p.out.clear();
     }
 }
 
@@ -82,24 +64,51 @@ void StartOutput(std::function<void(float*, uint32_t)> render) {
         return;
     }
     SDL_AudioSpec spec{SDL_AUDIO_F32, 2, int(kRate)};
-    auto* pump = new Pump{std::move(render)};
-    g_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, Feed, pump);
+    // Open stream WITHOUT callback: we feed it from our own dedicated thread, decoupling
+    // DirectSound mixing and g_lock contention from OS real-time audio driver deadlines.
+    g_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, nullptr, nullptr);
     if (!g_stream) {
         LOGE("audio: no output device, no sound: %s", SDL_GetError());
-        delete pump;
         return;
     }
-    LOGI("audio: %s output through %s", IsSurround() ? "5.1 folded to stereo" : "stereo", SDL_GetCurrentAudioDriver());
+    LOGI("audio: %s output through %s (decoupled worker thread, 60ms cushion)",
+         IsSurround() ? "5.1 folded to stereo" : "stereo", SDL_GetCurrentAudioDriver());
 
-    // Pre-fill stream with 60 ms cushion so audio starts smoothly without an initial underrun pop
-    for (int i = 0; i < 6; i++) {
-        pump->render(pump->mix.data(), kBlock);
-        Fold(pump->mix.data(), kBlock, g_mode == kOutputMono, pump->out);
-        SDL_PutAudioStreamData(g_stream, pump->out.data(), int(pump->out.size() * sizeof(float)));
-        pump->out.clear();
-    }
+    g_running = true;
+    g_audio_thread = std::thread([render = std::move(render)] {
+        std::vector<float> mix(kBlock * kChannels);
+        std::vector<float> out;
+        out.reserve(kBlock * 2);
 
-    if (!g_paused) SDL_ResumeAudioStreamDevice(g_stream);
+        // Pre-fill stream with 60 ms cushion so audio starts smoothly without an initial underrun pop
+        for (int i = 0; i < 6; i++) {
+            render(mix.data(), kBlock);
+            Fold(mix.data(), kBlock, g_mode == kOutputMono, out);
+            SDL_PutAudioStreamData(g_stream, out.data(), int(out.size() * sizeof(float)));
+            out.clear();
+        }
+
+        if (!g_paused) SDL_ResumeAudioStreamDevice(g_stream);
+
+        while (g_running) {
+            if (g_paused) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                continue;
+            }
+
+            int queued = SDL_GetAudioStreamQueued(g_stream);
+            if (queued >= kTargetQueuedBytes) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(3));
+                continue;
+            }
+
+            render(mix.data(), kBlock);
+            Fold(mix.data(), kBlock, g_mode == kOutputMono, out);
+            SDL_PutAudioStreamData(g_stream, out.data(), int(out.size() * sizeof(float)));
+            out.clear();
+        }
+    });
+    g_audio_thread.detach();
 }
 
 }  // namespace audio
