@@ -53,6 +53,9 @@ Traditional methods for running classic console games on Linux suffer from sever
 ## 🆕 What's New & Changelog
 
 ### Version 0.1.10 (Latest)
+- **Fix Audio Popping, Crackling, and Buffer Underruns (FMV Intro & Dialogue Peaks)**:
+  - Resolved hardware buffer starvation in `desktop/audio.cpp` by maintaining an active 40 ms queue cushion (`kCushionBytes = 15,360 bytes`) inside `SDL_AudioStream` and pre-filling the buffer before playback resumes. This completely absorbs thread scheduling jitter and memory bandwidth spikes during FMV video playback (such as the Josie Maran intro movie) and high-load gameplay.
+  - Fixed digital clipping and 16-bit integer polarity wrap-around overflow in `Fold()` by clamping folded 5.1-to-stereo audio frame sums to legal float bounds `[-1.0f, 1.0f]`. Previously, loud vocal transients summing over background music and reverb caused signal peaks above `1.0f`, resulting in harsh clicks and popping on dialogue plosives.
 - **Fix Post-Race Career Track Loading Freeze / Hang (7% CPU Spinlock Fix)**:
   - Resolved a critical thread race condition where multiple I/O worker threads and the main thread accessed the shared `ZZDATA` archive handle concurrently without synchronization (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`), which previously scrambled file read offsets, fed corrupt chunk headers to the chunk loader (`0x1C0460`), and caused an infinite spin loop on 1 CPU core (~7% CPU usage on modern multi-core processors) leaving players stuck on the "Loading..." screen after completing a career track.
   - Implemented recursive mutex synchronization for EA's slot pool allocator and free lists (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) to prevent cyclic linked-list corruption during rapid file open/close cycles between events.

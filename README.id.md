@@ -53,6 +53,9 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 ## 🆕 Yang Baru & Changelog
 
 ### Versi 0.1.10 (Terbaru)
+- **Perbaikan Suara Meletup/Kresek-kresek (*Audio Popping/Crackling*) pada Cutscene & Dialog**:
+  - Mengatasi masalah *buffer underrun / audio starvation* pada `desktop/audio.cpp` dengan menerapkan bantalan antrean aktif sebesar 40 ms (`kCushionBytes = 15.360 bytes`) pada `SDL_AudioStream` serta melakukan *pre-buffering* sebelum audio device diaktifkan. Hal ini menyerap jeda penjadwalan thread dan beban CPU saat pemutaran video FMV intro (adegan pembuka Josie Maran / Mia) maupun saat gameplay berat.
+  - Memperbaiki distorsi *digital clipping* dan *integer wrap-around overflow* pada fungsi `Fold()` dengan mengunci (*clamping*) nilai gelombang stereo hasil *downmix* 5.1 ke rentang aman `[-1.0f, 1.0f]`. Sebelumnya, suara vokal dialog yang bertumpuk dengan musik latar belakang menghasilkan amplitudo melebihi `1.0f` yang memicu suara letupan keras (*audio pop/click*) pada setiap puncak nada bicara.
 - **Perbaikan Bug Stuck Loading Setelah Selesai Balapan Career (Fix 7% CPU Usage Hang)**:
   - Memperbaiki race condition threading di mana 3 thread I/O job worker dan main thread mengakses file handle arsip `ZZDATA` secara bersamaan tanpa sinkronisasi (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`). Sebelumnya, hal ini menyebabkan offset baca file tertimpa, menghasilkan data chunk corrupt pada chunk loader (`0x1C0460`), dan membuat 1 core prosesor terjebak dalam infinite loop (7% CPU usage di task manager) dengan layar macet di "Loading..." setelah menyelesaikan race di Career mode.
   - Menambahkan penguncian mutex rekursif pada pool alokasi memori EA (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) untuk mencegah rusaknya pointer free list saat file dibuka-tutup secara cepat saat transisi event.
