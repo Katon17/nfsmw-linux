@@ -90,7 +90,7 @@ else()
     add_custom_target(image_header DEPENDS ${HDR}/image_symbols.h)
 endif()
 
-set(BUILD_COMMIT "0.1.10")
+set(BUILD_COMMIT "0.1.11")
 file(CONFIGURE OUTPUT ${HDR}/build_info.h CONTENT "#define NFSMW_COMMIT \"linux-${BUILD_COMMIT}\"\n")
 
 # ------------------------------------------------------------------ Host static library

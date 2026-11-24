@@ -395,7 +395,7 @@ void Dispatch(const SDL_Event& e) {
 }  // namespace
 
 int main(int, char**) {
-    SDL_SetAppMetadata("Need for Speed: Most Wanted (Black Edition)", "0.1.10", "nfsmw-linux");
+    SDL_SetAppMetadata("Need for Speed: Most Wanted (Black Edition)", "0.1.11", "nfsmw-linux");
     SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
     SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "0");

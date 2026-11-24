@@ -2,7 +2,7 @@
 
 🇬🇧 **English version**: lihat [README.md](README.md)
 
-[![Rilis: v0.1.10](https://img.shields.io/badge/Release-v0.1.10-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
+[![Rilis: v0.1.11](https://img.shields.io/badge/Release-v0.1.11-blue.svg)](https://github.com/Katon17/nfsmw-linux/releases)
 [![Platform: Linux x86_64](https://img.shields.io/badge/Platform-Linux%20x86__64-orange.svg)](https://kernel.org)
 [![Target: Linux Mint / Ubuntu / Debian](https://img.shields.io/badge/Target-Linux%20Mint%20%7C%20Ubuntu%20%7C%20Debian-87cf3e.svg)](https://linuxmint.com)
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
@@ -52,7 +52,14 @@ Metode tradisional menjalankan game klasik konsol di Linux menderita beban perfo
 
 ## 🆕 Yang Baru & Changelog
 
-### Versi 0.1.10 (Terbaru)
+### Versi 0.1.11 (Terbaru)
+- **Perbaikan Tuntas Suara "Pet-Pet-Pet / Nyetrum" (*Choppy/Buzzing Audio*)**:
+  - Mengganti arsitektur *audio pump callback* dengan *dedicated decoupled feeder thread* pada `desktop/audio.cpp`. Dengan arsitektur baru ini, audio driver OS (PipeWire / PulseAudio / ALSA) tidak lagi tertahan oleh mutex game (`g_lock`), menghilangkan 100% *buffer starvation / XRUN* yang menyebabkan suara getar/nyetrum (choppy 40–50 Hz gating) terutama saat cutscene dialog awal Mia dan musik gameplay.
+  - Menjaga bantalan antrean audio aktif sebesar 60 ms (`kTargetQueuedBytes = 23.040 bytes`) pada `SDL_AudioStream` dengan *pre-buffering* 6 blok awal sebelum perangkat audio dibuka.
+  - Menerapkan *headroom downmix scale* 0.75x dan *clamping* `[-1.0f, 1.0f]` agar sinyal stereo hasil fold 5.1 tidak mengalami *flat-top clipping / square-wave distortion*, menghasilkan suara dialog, vokal, dan raungan mesin yang jernih, dinamis, dan bersih.
+  - Memperbarui versi ke `0.1.11` agar skrip peluncur `nfsmw-linux` mendeteksi pergantian versi secara otomatis dan langsung melakukan relink binary lokal tanpa memerlukan instruksi manual.
+
+### Versi 0.1.10
 - **Perbaikan Suara Meletup/Kresek-kresek (*Audio Popping/Crackling*) pada Cutscene & Dialog**:
   - Mengatasi masalah *buffer underrun / audio starvation* pada `desktop/audio.cpp` dengan menerapkan bantalan antrean aktif sebesar 40 ms (`kCushionBytes = 15.360 bytes`) pada `SDL_AudioStream` serta melakukan *pre-buffering* sebelum audio device diaktifkan. Hal ini menyerap jeda penjadwalan thread dan beban CPU saat pemutaran video FMV intro (adegan pembuka Josie Maran / Mia) maupun saat gameplay berat.
   - Memperbaiki distorsi *digital clipping* dan *integer wrap-around overflow* pada fungsi `Fold()` dengan mengunci (*clamping*) nilai gelombang stereo hasil *downmix* 5.1 ke rentang aman `[-1.0f, 1.0f]`. Sebelumnya, suara vokal dialog yang bertumpuk dengan musik latar belakang menghasilkan amplitudo melebihi `1.0f` yang memicu suara letupan keras (*audio pop/click*) pada setiap puncak nada bicara.
@@ -168,12 +175,12 @@ Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat ke
 Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
 
 ### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.10_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
+Unduh rilis terbaru **`nfsmw-linux_0.1.11_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
 
 * **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
 * **Opsi Terminal**:
   ```bash
-  sudo apt install ./nfsmw-linux_0.1.10_amd64.deb
+  sudo apt install ./nfsmw-linux_0.1.11_amd64.deb
   ```
 
 Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
@@ -246,7 +253,7 @@ cd nfsmw-linux
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.10_amd64.deb`.
+Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.11_amd64.deb`.
 
 ---
 
@@ -256,7 +263,7 @@ Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.10_amd64.deb`.
 * **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
 * **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
   ```bash
-  sudo dpkg -i nfsmw-linux_0.1.10_amd64.deb
+  sudo dpkg -i nfsmw-linux_0.1.11_amd64.deb
   nfsmw-linux --rebuild
   ```
 
