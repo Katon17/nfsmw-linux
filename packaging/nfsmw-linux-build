@@ -109,8 +109,10 @@ command -v "$CXX" >/dev/null 2>&1 || MISSING_TOOLS+=("$CXX")
 command -v python3 >/dev/null 2>&1 || MISSING_TOOLS+=("python3")
 
 if [[ ${#MISSING_TOOLS[@]} -gt 0 ]]; then
-    if command -v pacman >/dev/null 2>&1; then
-        fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Arch Linux / Steam Deck, instal via:\n  sudo pacman -S clang lld python"
+    if command -v steamos-readonly >/dev/null 2>&1 || grep -qi "steamos" /etc/os-release 2>/dev/null; then
+        fail "Compiler toolchain (${MISSING_TOOLS[*]}) belum terpasang di Steam Deck.\n\nOpsi 1 (Paling Mudah - Tanpa Terminal di Steam Deck):\nJika sudah pernah menjalankan game di PC Linux, cukup salin folder '~/.local/share/nfsmw-linux' dari PC ke Steam Deck.\n\nOpsi 2 (Instalasi via Terminal Konsole Steam Deck):\n  sudo steamos-readonly disable\n  sudo pacman-key --init && sudo pacman-key --populate archlinux holo\n  sudo pacman -Sy --noconfirm clang lld python\n  sudo steamos-readonly enable"
+    elif command -v pacman >/dev/null 2>&1; then
+        fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Arch Linux, instal via:\n  sudo pacman -S clang lld python"
     elif command -v dnf >/dev/null 2>&1; then
         fail "Toolchain tidak lengkap (${MISSING_TOOLS[*]}). Pada Fedora / Nobara, instal via:\n  sudo dnf install clang lld python3"
     else

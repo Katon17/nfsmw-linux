@@ -60,6 +60,32 @@ Lalu tambahkan file `~/Games/nfsmw-linux-0.1.13-portable/nfsmw-linux` ke Steam s
 
 ---
 
+## 🔧 Pemecahan Masalah di Steam Deck (Troubleshooting)
+
+### Error: "Compiler toolchain (clang++ lld) belum terpasang"
+Pada SteamOS, compiler `clang` dan `lld` tidak terpasang secara bawaan. Ada dua cara mudah untuk mengatasinya:
+
+#### Opsi 1: Salin dari PC (Paling Mudah — Tanpa Terminal di Steam Deck)
+Jika Anda (atau teman Anda) sudah pernah menjalankan game ini sekali di laptop/PC Linux:
+1. Buka folder `~/.local/share/nfsmw-linux/` di PC tersebut.
+2. Salin seluruh folder `nfsmw-linux` tersebut ke Steam Deck di path yang sama (`/home/deck/.local/share/nfsmw-linux/`).
+3. Jalankan AppImage di Steam Deck — game langsung jalan seketika tanpa perlu compile lagi!
+
+#### Opsi 2: Instal Compiler via Terminal Konsole Steam Deck
+Jika Anda ingin mengompilasi langsung di Steam Deck:
+Buka **Konsole** di Desktop Mode, lalu jalankan perintah berikut:
+```bash
+sudo steamos-readonly disable
+sudo pacman-key --init
+sudo pacman-key --populate archlinux holo
+sudo pacman -Sy --noconfirm clang lld python
+sudo steamos-readonly enable
+```
+*(Catatan: Langkah `pacman-key` penting untuk mencegah pesan error "signature / corruption" di SteamOS).*
+Setelah itu, buka AppImage kembali dan game akan langsung mengompilasi ISO Anda!
+
+---
+
 ## ⚙️ Optimasi Performa & Baterai di Steam Deck
 - **Framerate Target**: Game terkunci mulus di **60 FPS**.
 - **TDP Limit**: Anda dapat menurunkan TDP Steam Deck ke **7W - 9W** di Quick Access Menu (`...` button) untuk menghemat baterai hingga 4–5 jam gameplay nonstop.
