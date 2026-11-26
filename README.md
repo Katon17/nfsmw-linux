@@ -58,51 +58,11 @@ Tested and working on:
 
 Running native on an old ThinkPad X270 (HD 620) at 60 FPS without Wine.
 
-| Specification | Minimum | Recommended |
-|---|---|---|
-| **Operating System** | Linux Mint, Ubuntu, Debian, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 (x86_64) |
-| **Processor (CPU)** | Intel Core i3 4th Gen / AMD Athlon (SSE4.2 required) | Intel Core i5 / i7 or AMD Ryzen |
-| **Graphics (GPU)** | Intel HD 4400 / 520, AMD Radeon R5 (Vulkan 1.1 required) | Intel HD 620 / Iris Xe / AMD Vega / dedicated GPU |
-| **RAM** | 4 GB | 8 GB |
-| **Storage** | ~4 GB available space | SSD |
-
 ---
 
 ## 🎮 Controls
 
-### Keyboard (WASD)
-
-| Action | Key | Description |
-|---|:---:|---|
-| **Throttle / Accelerate** | `W` | Gas pedal |
-| **Brake / Reverse** | `S` | Foot brake and reverse |
-| **Steer Left** | `A` | Steer left |
-| **Steer Right** | `D` | Steer right |
-| **Handbrake / Drift** | `Spacebar` | E-brake |
-| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Shift up |
-| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Shift down |
-| **Nitrous (NOS)** | `Left Shift` | Nitrous oxide |
-| **Speedbreaker** | `X` | Slow motion |
-| **Look Back** | `C` | Rear view camera |
-| **Change Camera** | `V` | Switch camera angle |
-| **Horn** | `H` | Honk horn |
-| **Reset Car** | `R` | Reset car to track |
-| **Pause Game** | `Escape` | Pause menu |
-| **Navigate Menus** | `Arrow Keys` | Menu navigation |
-| **Select / Enter** | `Enter` | Confirm selection |
-| **Overlay Settings** | `F10` | Rebind keys and adjust graphics |
-
-### Gamepads (Xbox, PlayStation, USB)
-Plug-and-play controller support via SDL3:
-- **Accelerate**: Right Trigger (`RT` / `R2`)
-- **Brake / Reverse**: Left Trigger (`LT` / `L2`)
-- **Steer**: Left Stick
-- **Shift Up / Down**: Right Stick Up / Down
-- **Handbrake**: `A` (Xbox) / `Cross` (PlayStation)
-- **Nitrous**: `B` (Xbox) / `Circle` (PlayStation)
-- **Speedbreaker**: `X` (Xbox) / `Square` (PlayStation)
-- **Look Back**: `Y` (Xbox) / `Triangle` (PlayStation)
-- **Pause**: `Start` / `Options`
+The game uses WASD for driving and Spacebar for the handbrake. Standard gamepads are supported natively. If you want to change button bindings, press F10 while playing.
 
 ---
 
@@ -136,10 +96,7 @@ nfsmw-linux --clean-cache
 
 ## 📁 File Locations
 
-* **Game Saves & Career Profiles**: `~/.local/share/nfsmw-linux/hdd/`
-* **Configuration File**: `~/.local/share/nfsmw-linux/mostwanted.toml`
-* **Vulkan Shader Cache**: `~/.local/share/nfsmw-linux/mesa_cache/`
-* **Compiled Game Binary**: `~/.local/share/nfsmw-linux/bin/MOSTWANTED`
+Save games and mostwanted.toml are placed under `~/.local/share/nfsmw-linux`. You do not have to worry about updates overwriting your career progress.
 
 ---
 

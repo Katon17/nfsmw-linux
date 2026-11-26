@@ -58,51 +58,11 @@ Sudah dites jalan lancar di:
 
 Di ThinkPad X270 lawas (Intel HD 620), game jalan lancar di 60 FPS tanpa Wine.
 
-| Komponen | Minimum | Rekomendasi |
-|---|---|---|
-| **Sistem Operasi** | Linux Mint, Ubuntu, Debian, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 (x86_64) |
-| **Prosesor (CPU)** | Intel Core i3 Gen 4 / AMD Athlon (Wajib SSE4.2) | Intel Core i5 / i7 atau AMD Ryzen |
-| **Grafis (GPU)** | Intel HD 4400 / 520, AMD Radeon R5 (Wajib Vulkan 1.1) | Intel HD 620 / Iris Xe / AMD Vega / GPU dedicated |
-| **RAM** | 4 GB | 8 GB |
-| **Penyimpanan** | ~4 GB ruang kosong | SSD |
-
 ---
 
 ## 🎮 Kontrol
 
-### Keyboard (WASD)
-
-| Aksi | Tombol | Keterangan |
-|---|:---:|---|
-| **Gas / Akselerasi** | `W` | Pedal gas |
-| **Rem / Mundur** | `S` | Rem kaki dan mundur |
-| **Belok Kiri** | `A` | Kemudi kiri |
-| **Belok Kanan** | `D` | Kemudi kanan |
-| **Rem Tangan / Drift** | `Spasi` | Handbrake |
-| **Oper Gigi Naik (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi |
-| **Oper Gigi Turun (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi |
-| **Nitro (NOS)** | `Shift Kiri` | Nitro boost |
-| **Speedbreaker** | `X` | Efek gerak lambat |
-| **Lihat Belakang** | `C` | Spion belakang |
-| **Ganti Kamera** | `V` | Ganti sudut pandang |
-| **Klakson** | `H` | Bunyikan klakson |
-| **Reset Posisi Mobil** | `R` | Kembalikan mobil ke jalan |
-| **Jeda / Pause** | `Escape` | Menu pause |
-| **Navigasi Menu** | `Tombol Panah` | Navigasi menu |
-| **Pilih / Enter** | `Enter` | Konfirmasi pilihan |
-| **Menu Pengaturan Port** | `F10` | Atur tombol dan grafis |
-
-### Gamepad (Xbox, PlayStation, USB)
-Mendukung gamepad otomatis via SDL3:
-- **Gas**: Pemicu Kanan (`RT` / `R2`)
-- **Rem / Mundur**: Pemicu Kiri (`LT` / `L2`)
-- **Kemudi**: Stik Analog Kiri
-- **Oper Gigi Naik / Turun**: Stik Analog Kanan Atas / Bawah
-- **Rem Tangan**: `A` (Xbox) / `Silang` (PlayStation)
-- **Nitro**: `B` (Xbox) / `Lingkaran` (PlayStation)
-- **Speedbreaker**: `X` (Xbox) / `Kotak` (PlayStation)
-- **Lihat Belakang**: `Y` (Xbox) / `Segitiga` (PlayStation)
-- **Jeda**: `Start` / `Options`
+Game ini pakai tombol WASD untuk stir dan gas, serta Spasi untuk rem tangan. Gamepad standar langsung kedeteksi otomatis. Kalau mau ganti konfigurasi tombol, tinggal tekan F10 pas game jalan.
 
 ---
 
@@ -136,10 +96,7 @@ nfsmw-linux --clean-cache
 
 ## 📁 Lokasi Berkas
 
-* **Save Game & Profil Career**: `~/.local/share/nfsmw-linux/hdd/`
-* **Berkas Konfigurasi**: `~/.local/share/nfsmw-linux/mostwanted.toml`
-* **Cache Shader Vulkan**: `~/.local/share/nfsmw-linux/mesa_cache/`
-* **Biner Game**: `~/.local/share/nfsmw-linux/bin/MOSTWANTED`
+File save dan mostwanted.toml tersimpan di `~/.local/share/nfsmw-linux`. Jadi update versi tidak akan menimpa progress career kamu.
 
 ---
 
