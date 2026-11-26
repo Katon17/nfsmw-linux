@@ -40,17 +40,9 @@ Port native langsung menghasilkan satu biner Vulkan yang jalan di Linux tanpa em
 
 ## 🎮 Cara Pasang
 
-### Linux Mint / Ubuntu / Debian (.deb)
-File `.deb` sudah ada di GitHub releases kalau mau coba. Tinggal install lewat file manager atau software center, lalu pilih file ISO Xbox kamu pas diminta.
+Paket instalasi ada di halaman releases GitHub. Kamu butuh file ISO game Xbox sendiri untuk memainkannya. Di Debian atau Mint, pasang file deb lalu jalankan gamenya. Di Steam Deck, tambahkan file AppImage sebagai non-Steam game di desktop mode.
 
-Atau via terminal:
-```bash
-sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
-```
-Buka gamenya lewat menu aplikasi desktop di bagian **Games**.
-
-### Steam Deck & SteamOS
-Untuk pengguna Steam Deck atau distro non-Debian, ada file AppImage dan portable tarball. Di Steam Deck tinggal tambahkan AppImage sebagai non-Steam game di desktop mode. Panduan lengkap SteamOS ada di [README-STEAM-DECK.md](README-STEAM-DECK.md).
+Panduan lengkap SteamOS ada di [README-STEAM-DECK.md](README-STEAM-DECK.md).
 
 ---
 

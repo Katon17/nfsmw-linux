@@ -40,19 +40,9 @@ A native port gives you a single Vulkan binary that runs on Linux directly. That
 
 ## 🎮 Installation
 
-### Linux Mint / Ubuntu / Debian (.deb)
-I uploaded a `.deb` on GitHub releases if you want to test it. You can just install it from your file manager and pick your Xbox ISO when it prompts you.
+Builds are available under releases on GitHub. You will need your own Xbox game ISO to build it. On Debian or Mint, install the deb file and launch the game. On Steam Deck, add the AppImage as a non-Steam game in desktop mode.
 
-Terminal install:
-```bash
-sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
-```
-Then launch Need for Speed from your desktop application menu under **Games**.
-
-### Steam Deck & SteamOS
-I put together an AppImage and tarball for Steam Deck. You can find them under releases on GitHub. Add the file as a non-Steam shortcut in desktop mode. Gaming mode runs fine at 60 FPS and you don't have to fiddle with controls. It also uses KDialog for picking the ISO file.
-
-Check [README-STEAM-DECK.md](README-STEAM-DECK.md) for details.
+Check [README-STEAM-DECK.md](README-STEAM-DECK.md) for SteamOS details.
 
 ---
 
