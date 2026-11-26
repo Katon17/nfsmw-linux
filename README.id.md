@@ -8,11 +8,13 @@
 [![Grafis: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
 [![Jendela & Input: SDL3](https://img.shields.io/badge/Host-SDL3-blue.svg)](https://libsdl.org)
 [![Rekompilasi: XboxXBE-Recomp](https://img.shields.io/badge/Recomp-XboxXBE--Recomp-green.svg)](https://github.com/TGP482/XboxXBE-Recomp)
-[![Status: Terverifikasi 100+ FPS](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-performa-terverifikasi--spesifikasi-sistem)
+[![Status: Terverifikasi 100+ FPS](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-performa--spesifikasi-perangkat)
 [![Dukungan: Saweria](https://img.shields.io/badge/Support-Saweria-orange.svg)](https://saweria.co/Kabako)
 [![Dukungan: Ko-fi](https://img.shields.io/badge/Support-Ko--fi-ff5e5b.svg)](https://ko-fi.com/katonbagaskoro)
 
-Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need for Speed: Most Wanted (Black Edition)** (2005, Xbox original), dikelola oleh [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), berbasis [MostWanted-Android dari RanggaCasper](https://github.com/RanggaCasper/MostWanted-Android) dan [XboxXBE-Recomp dari TGP482](https://github.com/TGP482/XboxXBE-Recomp).
+Build desktop native Linux dan paket `.deb` untuk **Need for Speed: Most Wanted (Black Edition)** (rilis Xbox original 2005). Dikelola oleh [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), berbasis [MostWanted-Android milik RanggaCasper](https://github.com/RanggaCasper/MostWanted-Android) dan [XboxXBE-Recomp milik TGP482](https://github.com/TGP482/XboxXBE-Recomp).
+
+Port native langsung menghasilkan satu biner Vulkan yang jalan di Linux tanpa emulator atau Wine. Itu kelebihan utamanya. Selain itu kita bisa langsung benerin bug engine game di kode C++ dibanding pakai memory hack di Windows.
 
 ---
 
@@ -36,284 +38,121 @@ Port desktop native Linux berkinerja tinggi sekaligus paket `.deb` dari **Need f
 
 ---
 
-## ⚡ Mengapa Port Native Ini?
+## 🎮 Cara Pasang
 
-Metode tradisional menjalankan game klasik konsol di Linux menderita beban performa yang parah:
-- **Emulator (Xemu, RPCS3, PCSX2)**: Mengemulasi CPU instruksi demi instruksi dan mensimulasikan register GPU dalam loop perangkat lunak. Pada laptop dual-core kelas bawah seperti **ThinkPad X270 (Intel Core i5/i7 Generasi ke-7, Intel HD 620)**, emulator hanya mampu 15–25 FPS dengan suara yang patah-patah.
-- **Wine / Proton**: Menambahkan lapisan terjemahan DXVK, shim API Windows, dan konsumsi memori latar yang berat.
+### Linux Mint / Ubuntu / Debian (.deb)
+File `.deb` sudah ada di GitHub releases kalau mau coba. Tinggal install lewat file manager atau software center, lalu pilih file ISO Xbox kamu pas diminta.
 
-**`nfsmw-linux` mengambil pendekatan rekompilasi murni native**:
-1. **Rekompilasi Statis**: Menerjemahkan langsung instruksi assembly x86 Xbox original dari `default.xbe` menjadi kode C++ modern secara ahead-of-time.
-2. **Host Vulkan 1.1 Langsung**: Menerjemahkan draw call Direct3D 8, stream DirectSound, dan primitif sinkronisasi kernel langsung menjadi **Vulkan 1.1** bare-metal, audio **SDL3**, dan thread POSIX Linux.
-3. **Tanpa Lapisan Emulasi**: Berjalan sebagai biner ELF 64-bit Linux (`x86_64`) native yang sesungguhnya di atas bare metal.
-4. **100+ FPS di Laptop Kelas Bawah**: Memberikan frame rate yang mulus dan kontrol yang responsif bahkan pada grafis terintegrasi 15W low-power (Intel HD 620).
+Atau via terminal:
+```bash
+sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
+```
+Buka gamenya lewat menu aplikasi desktop di bagian **Games**.
 
----
-
-## 🆕 Yang Baru & Changelog
-
-### Versi 0.1.13 (Terbaru)
-- **Dukungan Penuh Valve Steam Deck & Distro Non-Debian (AppImage & Portable Tarball)**:
-  - Menyediakan format berkas mandiri **`nfsmw-linux_0.1.13_x86_64.AppImage`** yang dapat langsung ditambahkan ke Steam sebagai *Non-Steam Game* di Desktop Mode dan dimainkan langsung di Gaming Mode.
-  - Menyediakan arsip **`nfsmw-linux_0.1.13_portable.tar.gz`** untuk instalasi mandiri di folder game pengguna tanpa memerlukan akses root (`sudo`).
-  - Mendukung antarmuka pemilihan file via **KDialog** (lingkungan desktop KDE Plasma / Steam Deck) selain Zenity.
-  - Skrip builder otomatis mengenali package manager `pacman` (Arch/SteamOS), `dnf` (Fedora), dan `apt` (Debian/Ubuntu) serta mendeteksi compiler `clang++` maupun `g++` secara dinamis.
-  - Panduan lengkap khusus Steam Deck tersedia di [README-STEAM-DECK.md](README-STEAM-DECK.md).
-- **Perbaikan Crash Game (Restore Return Address `ctx.esp += 4` & Defensive Memory Checks)**:
-  - Mengembalikan instruksi `ctx.esp += 4` pada fungsi pengatur volume stream `sub_002D6D40` di `src/game/game_threads.cpp`. Penghapusan instruksi ini sebelumnya merusak stack alignment saat EA Trax mengatur volume musik, mengakibatkan crash / SIGSEGV.
-  - Menambahkan pengamanan memori `mem::IsCommitted` pada audio group pointer, channel, stream, dan vtable di `sub_002D6D40` untuk mencegah dereference pointer liar saat transisi audio game.
-  - Mempertahankan driver default **PulseAudio** yang sudah terbukti 100% jernih dan bebas kresek-kresek di Linux Mint 22 / Ubuntu 24.04.
-
-### Versi 0.1.12
-- **Konfigurasi Audio Driver PulseAudio Otomatis (Fix 100% Suara Nyetrum & Jernih Sempurna)**:
-  - Secara default menetapkan driver audio SDL3 ke **PulseAudio** (`SDL_AUDIO_DRIVER=pulseaudio`, `PULSE_LATENCY_MSEC=40`, dan `SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES=1024`) baik pada skrip peluncur `/usr/bin/nfsmw-linux` maupun internal inisialisasi binary game `desktop/main.cpp`.
-  - Menghilangkan sepenuhnya masalah latensi rendah/buffer underrun PipeWire di Linux Mint 22 / Ubuntu 24.04 yang menyebabkan suara bergetar nyetrum atau *pet-pet-pet* 50 Hz pada video cutscene Mia dan musik in-game.
-  - Game langsung bersuara jernih dan sempurna saat dibuka dari icon desktop maupun menu aplikasi tanpa perlu mengetik parameter terminal tambahan.
-
-### Versi 0.1.11
-- **Perbaikan Tuntas Suara "Pet-Pet-Pet / Nyetrum" (*Choppy/Buzzing Audio*)**:
-  - Mengganti arsitektur *audio pump callback* dengan *dedicated decoupled feeder thread* pada `desktop/audio.cpp`. Dengan arsitektur baru ini, audio driver OS (PipeWire / PulseAudio / ALSA) tidak lagi tertahan oleh mutex game (`g_lock`), menghilangkan 100% *buffer starvation / XRUN* yang menyebabkan suara getar/nyetrum (choppy 40–50 Hz gating) terutama saat cutscene dialog awal Mia dan musik gameplay.
-  - Menjaga bantalan antrean audio aktif sebesar 60 ms (`kTargetQueuedBytes = 23.040 bytes`) pada `SDL_AudioStream` dengan *pre-buffering* 6 blok awal sebelum perangkat audio dibuka.
-  - Menerapkan *headroom downmix scale* 0.75x dan *clamping* `[-1.0f, 1.0f]` agar sinyal stereo hasil fold 5.1 tidak mengalami *flat-top clipping / square-wave distortion*, menghasilkan suara dialog, vokal, dan raungan mesin yang jernih, dinamis, dan bersih.
-  - Memperbarui versi ke `0.1.11` agar skrip peluncur `nfsmw-linux` mendeteksi pergantian versi secara otomatis dan langsung melakukan relink binary lokal tanpa memerlukan instruksi manual.
-
-### Versi 0.1.10
-- **Perbaikan Suara Meletup/Kresek-kresek (*Audio Popping/Crackling*) pada Cutscene & Dialog**:
-  - Mengatasi masalah *buffer underrun / audio starvation* pada `desktop/audio.cpp` dengan menerapkan bantalan antrean aktif sebesar 40 ms (`kCushionBytes = 15.360 bytes`) pada `SDL_AudioStream` serta melakukan *pre-buffering* sebelum audio device diaktifkan. Hal ini menyerap jeda penjadwalan thread dan beban CPU saat pemutaran video FMV intro (adegan pembuka Josie Maran / Mia) maupun saat gameplay berat.
-  - Memperbaiki distorsi *digital clipping* dan *integer wrap-around overflow* pada fungsi `Fold()` dengan mengunci (*clamping*) nilai gelombang stereo hasil *downmix* 5.1 ke rentang aman `[-1.0f, 1.0f]`. Sebelumnya, suara vokal dialog yang bertumpuk dengan musik latar belakang menghasilkan amplitudo melebihi `1.0f` yang memicu suara letupan keras (*audio pop/click*) pada setiap puncak nada bicara.
-- **Perbaikan Bug Stuck Loading Setelah Selesai Balapan Career (Fix 7% CPU Usage Hang)**:
-  - Memperbaiki race condition threading di mana 3 thread I/O job worker dan main thread mengakses file handle arsip `ZZDATA` secara bersamaan tanpa sinkronisasi (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`). Sebelumnya, hal ini menyebabkan offset baca file tertimpa, menghasilkan data chunk corrupt pada chunk loader (`0x1C0460`), dan membuat 1 core prosesor terjebak dalam infinite loop (7% CPU usage di task manager) dengan layar macet di "Loading..." setelah menyelesaikan race di Career mode.
-  - Menambahkan penguncian mutex rekursif pada pool alokasi memori EA (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) untuk mencegah rusaknya pointer free list saat file dibuka-tutup secara cepat saat transisi event.
-  - Memperbaiki potensi freeze/crash volume audio stream (`sub_002D6D40`) saat keluar dari balapan.
-  - Memperbaiki race condition pada EA file stream reader (`sub_00087A40`) agar pemutaran video cutscene/FMV transisi berjalan stabil tanpa SIGSEGV.
-  - Menambahkan proteksi hash user profile save (`sub_00147600`) agar file save Career tidak ditolak sebagai corrupt/damaged.
-  - Mengaktifkan rendering full-frame pada front-end (`FullFrameFrontEnd()`) untuk menghilangkan border hitam TV overscan pada layar loading.
-  - Meningkatkan batas memori fisik guest dari 64 MB menjadi 128 MB (`kPhysicalSize`) guna mencegah kehabisan memori streaming aset dunia balap.
-
-### Versi 0.1.9
-- **Ikon Baru Aplikasi Desktop (Logo Graffiti NFS Most Wanted + Tux Linux)**:
-  - Memperbarui ikon peluncur desktop (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, dan multi-resolusi PNG hingga 512×512) dengan karya seni logo graffiti Need for Speed: Most Wanted berlatar plat gelap dan maskot Tux the Linux Penguin.
-  - Memperbaiki `SDL_HINT_APP_ID` menjadi `nfsmw-linux` sehingga panel dan taskbar desktop (XFCE, Linux Mint, Ubuntu) langsung mengenali serta menampilkan ikon resmi aplikasi.
-- **Pembersihan Menu Grafis (Menghilangkan Opsi Telemetri Non-Fungsional)**:
-  - Menghilangkan opsi **"SHOW CPU / GPU USAGE"** dan **"SHOW TEMPERATURES"** dari menu pengaturan Graphics in-game serta overlay F10.
-  - Kedua opsi tersebut merupakan fitur bawaan Android yang tidak memiliki indikator/fungsi di desktop Linux, sehingga menu pengaturan grafis kini menjadi lebih ringkas, bersih, dan bebas dari opsi dummy.
-
-### Versi 0.1.8
-- **Fitur Toggle Filter Kuning ("YELLOW TINT" ON / OFF)**:
-  - Menambahkan pengaturan **"YELLOW TINT"** di dalam menu **Graphics** in-game dan overlay F10, serta opsi konfigurasi `yellow_tint` pada `mostwanted.toml`.
-  - Pemain kini dapat memilih antara visual klasik bernuansa kuning/sepia khas Need for Speed: Most Wanted (ON), atau mematikannya (OFF) untuk menghasilkan pencahayaan alami yang jernih, tajam, dan realistis tanpa efek filter kuning.
-- **Tautan Donasi Resmi Ko-fi di Menu Credits & Support**:
-  - Menambahkan tombol donasi resmi **[Ko-fi (ko-fi.com/katonbagaskoro)](https://ko-fi.com/katonbagaskoro)** di bagian **SUPPORT** pada menu **Credits** dan **General**, bersanding dengan Saweria.
-  - Membuka tautan Ko-fi langsung di peramban desktop dengan sekali klik.
-
-### Versi 0.1.7
-- **Pengaturan Kontrol Eksklusif & Nyaman via Overlay F10**:
-  - Menghilangkan bagian *Controls* pada karusel menu opsi bawaan in-game ("setting biasa") sehingga pemain tidak lagi mengalami bentrok tombol atau freeze.
-  - Seluruh konfigurasi tombol keyboard dan stik controller kini terpusat secara visual dan mulus di dalam menu **F10** (**Keyboard** & **Controller**).
-- **Perbaikan Bentrok Tombol Enter pada Pengaturan Kontrol**:
-  - Perekaman tombol (*Key Capture*) kini dipicu secara eksklusif hanya melalui klik kiri mouse pada kotak tombol, sehingga menekan tombol `Enter` atau `Space` tidak akan memicu aktivasi tombol ImGui yang tidak diinginkan.
-  - Menonaktifkan navigasi keyboard ImGui selama proses perekaman tombol aktif (`Capturing()`), sehingga tombol `Enter`, `Space`, ataupun tanda panah dapat langsung di-bind secara bersih tanpa interupsi.
-  - Menambahkan proteksi *duplicate unbind* otomatis di `input::Bind()`: jika tombol (misalnya `Enter`) di-bind ke aksi baru, tombol tersebut otomatis dilepas dari aksi lain agar tidak terjadi input ganda yang saling bertabrakan.
-
-### Versi 0.1.6
-- **Navigasi Multi-Tab Penuh pada Overlay F10**:
-  - Menghadirkan kembali bilah tab navigasi lengkap di bagian atas menu **F10** (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
-  - Pemain kini dapat berpindah tab secara instan, mengubah tombol keyboard dan stik controller secara visual melalui ImGui, mengaktifkan cheats, mengatur grafis, hingga membuka tautan pengembang dan tombol **Exit Game**.
-- **Solusi Tuntas Freeze Menu In-Game saat Rebinding Tombol**:
-  - Mengatasi masalah di mana menekan tombol `Enter` saat mengatur kontrol (status `< PRESS A KEY >`) dapat menyebabkan menu opsi (seperti karusel "Graphics") terkunci atau macet.
-  - Menambahkan *capture guard* pada `SwitchPackage` serta pembersihan `CancelCapture()` otomatis, sehingga perpindahan paket menu dibatalkan jika sedang dalam mode perekaman tombol dan navigasi menu tetap normal serta responsif.
-- **Deteksi Otomatis File Game untuk Update Cepat**:
-  - Skrip build launcher kini secara otomatis mendeteksi salinan file game yang sudah ada di sistem (`~/.local/share/nfsmw-linux/disc`), sehingga pembaruan versi langsung me-relink binary baru tanpa perlu memilih ulang file ISO atau membuka dialog Zenity.
-  - Memastikan konfigurasi `look_up = "PageUp"` dan `look_down = "PageDown"` otomatis terpasang pada `mostwanted.toml`.
-
-### Versi 0.1.5
-- **Oper Gigi Drag Race Langsung Bekerja (Out-of-the-Box Drag Shifting)**:
-  - Tombol oper gigi (Naik Gigi / Turun Gigi) kini di-mapping langsung ke **Page Up** (`PgUp`) dan **Page Down** (`PgDn`) (serta Numpad 8 dan Numpad 5).
-  - Pengguna laptop tanpa keypad Numpad fisik (seperti Lenovo ThinkPad X270) langsung dapat bermain mode Drag Race dan mengoper gigi tanpa perlu repot konfigurasi manual.
-- **Perbaikan Bentrok Tombol Enter / Accept saat Mengatur Kontrol In-Game**:
-  - Mengatasi masalah di mana tombol `Enter` bentrok antara fungsi navigasi `Accept / OK` menu dan perekaman tombol baru (*Key Capture*).
-  - Mengisolasi input stik controller selama proses perekaman tombol berlangsung (`app::Capturing()`), sehingga pemain dapat mengganti tombol apa pun langsung dari menu game secara mulus tanpa terpotong atau tertutup otomatis.
-- **Penyempurnaan Label Menu Kontrol**:
-  - Mengubah label menu di bagian Kontrol dari yang sebelumnya hanya *"Look Up"* dan *"Look Down"* menjadi: **"SHIFT UP / LOOK UP"** dan **"SHIFT DOWN / LOOK DOWN"**.
-
-### Versi 0.1.4
-- **Tautan Resmi Pengembang (Support & Media)**:
-  - Menu **General > SUPPORT** kini langsung terhubung ke profil resmi [Katon Bagaskoro](https://github.com/Katon17):
-    - **DONATE**: [Saweria (saweria.co/Kabako)](https://saweria.co/Kabako)
-    - **GITHUB**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
-    - **YOUTUBE**: [@KabakoNT (youtube.com/@KabakoNT)](https://www.youtube.com/@KabakoNT)
-- **Fitur Baru "EXIT GAME" (Keluar Game)**:
-  - Menambahkan menu `EXIT GAME` di dalam opsi **General** dan overlay **F10** untuk menutup permainan secara bersih ke desktop Linux (mem-flush log, membebaskan memori Vulkan/SDL3 tanpa meninggalkan proses *zombie*).
-  - Tersedia terjemahan otomatis dalam Bahasa Indonesia (`Keluar Game` ➔ `Keluar`) dan berbagai bahasa lainnya.
-- **Kredit Tim (Dual Port Credits)**:
-  - Menyempurnakan daftar **Credits** dengan mengapresiasi **Rangga Casper** sebagai pembuat port Android asal, dan **Katon Bagaskoro** sebagai pengembang port native Linux.
-- **Tampilan Antarmuka Khusus Linux (Linux Options & Ikon Tux)**:
-  - Opsi di menu utama kini bertuliskan **"Linux Options"** (atau **"Opsi Linux"**).
-  - Mengganti ikon robot Android dengan ikon custom **Tux the Linux Penguin** bersanding dengan roda gigi pengaturan dalam gaya monokrom khas Need for Speed.
-- **Perbaikan Masalah Linking Step `[3/3]` (Ernawan's Fix)**:
-  - Mengimplementasikan *weak symbols* (`__attribute__((weak))`) dan argumen linker `-Wl,--allow-multiple-definition`.
-  - Menghilangkan sepenuhnya error *duplicate symbol* maupun *undefined symbol* (`input::PadActions`, `host::SamplePerf`).
-- **Perbaikan Freeze / Stuck Loading Prologue Race 2 (Yokaiju's Fix)**:
-  - Mengatasi *deadlock* Vulkan fence saat transisi balapan mengalahkan SLR McLaren hitam (Bull) dengan pembatasan timeout 5 detik (`kGpuWaitTimeoutNs`).
-  - Mengganti `Destroy(down)` menjadi `Retire(down)` agar tekstur transfer in-flight tidak terhapus prematur saat GPU masih membaca data.
-  - Mengaktifkan fitur lewati video cutscene transisi secara manual kapan saja dengan tombol **Enter** atau **Spacebar** / Controller **A**.
-  - Membersihkan partisi scratch cache sementara Xbox (`hdd/X`, `hdd/Y`, `hdd/Z`) secara otomatis pada setiap boot game tanpa menyentuh progress save karier (`hdd/E/UDATA`).
+### Steam Deck & SteamOS
+Untuk pengguna Steam Deck atau distro non-Debian, ada file AppImage dan portable tarball. Di Steam Deck tinggal tambahkan AppImage sebagai non-Steam game di desktop mode. Panduan lengkap SteamOS ada di [README-STEAM-DECK.md](README-STEAM-DECK.md).
 
 ---
 
-## 📊 Performa Terverifikasi & Spesifikasi Sistem
+## 📊 Performa & Spesifikasi Perangkat
 
-### Benchmark Testbed Dunia Nyata
-Diuji pada perangkat keras asli oleh **Katon Bagaskoro**:
-* **Laptop**: Lenovo ThinkPad X270
-* **CPU**: Intel® Core™ i7-7600U @ 2.80GHz (2 Core / 4 Thread, 15W ULV)
-* **GPU**: Intel® HD Graphics 620 (driver Mesa Vulkan)
-* **RAM**: 8 GB DDR4
-* **OS**: Linux Mint 22.3 (XFCE 64-bit, Kernel 6.8 / 7.0)
-* **Performa dalam Game**: **104 – 121 FPS di Menu, Terkunci 60 – 61 FPS di Gameplay** pada resolusi native dengan tanpa stuttering, tanpa suara berderak, dan respons input instan.
+Sudah dites jalan lancar di:
+- Linux Mint
+- Ubuntu
+- Pop!_OS
+- MX Linux
+- Zorin OS
+- Debian
 
----
+Di ThinkPad X270 lawas (Intel HD 620), game jalan lancar di 60 FPS tanpa Wine.
 
-### Kebutuhan Perangkat Keras
-
-Berdasarkan pengujian empiris pada ThinkPad X270, berikut kebutuhan perangkat keras minimum dan yang direkomendasikan:
-
-| Spesifikasi | Minimum (30–45 FPS dapat dimainkan) | Direkomendasikan (Terkunci 60–120 FPS) |
+| Komponen | Minimum | Rekomendasi |
 |---|---|---|
-| **Sistem Operasi** | Linux Mint 21/22, Ubuntu 22.04/24.04, Debian 12, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 LTS (x86_64) |
-| **Prosesor (CPU)** | Intel Core i3 Generasi ke-4 (Haswell) / Celeron G3900 / AMD Athlon 200GE *(Harus mendukung `x86-64-v2` / SSE4.2)* | Intel Core i5 / i7 Generasi ke-6 atau ke-7 (mis. i7-7600U, i5-7200U) atau AMD Ryzen 3 2200U / Ryzen 5 |
-| **Grafis (GPU)** | Intel HD Graphics 4400 / 520, AMD Radeon R5 / HD 7000, NVIDIA GT 730 *(wajib mendukung Vulkan 1.1)* | Intel HD Graphics 620 / Intel Iris Xe / AMD Vega 3+ / NVIDIA GeForce 940MX atau GPU dedicated |
-| **RAM** | 4 GB | 8 GB (mempercepat kompilasi C++ awal satu kali) |
-| **Penyimpanan** | ~4 GB ruang tersedia (data game + cache) | Penyimpanan SSD direkomendasikan |
-
----
-
-## 🚀 Instalasi Cepat (Debian / Linux Mint / Ubuntu)
-
-Tidak memerlukan keahlian terminal. Instalasi sepenuhnya otomatis:
-
-### 1. Unduh & Instal Paket `.deb`
-Unduh rilis terbaru **`nfsmw-linux_0.1.13_amd64.deb`** dari halaman [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases):
-
-* **Opsi GUI**: Klik dua kali file `.deb` yang diunduh, lalu klik **Install Package** di GDebi atau Software Manager.
-* **Opsi Terminal**:
-  ```bash
-  sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
-  ```
-
-Semua dependensi yang diperlukan (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) diinstal secara otomatis.
-
-### 2. Jalankan & Pilih ISO Anda
-1. Buka menu aplikasi desktop Anda: **Menu ➔ Games ➔ Need for Speed: Most Wanted**.
-2. Dialog pemilihan file akan muncul: pilih image disc ISO Xbox original Anda dari **Need for Speed: Most Wanted (Black Edition - USA)**.
-3. Builder otomatis akan:
-   - Mengekstrak `default.xbe` menggunakan pembaca XDVDFS bawaan.
-   - Merekompilasi 28.848 fungsi game menjadi C++.
-   - Mengompilasi modul dan menautkan eksekutor native Linux.
-   - Mengkonfigurasi otomatis kontrol balap WASD yang optimal.
-4. Game langsung berjalan!
-
-*(Peluncuran berikutnya terbuka dalam 2 detik langsung ke dalam game tanpa rekompilasi).*
+| **Sistem Operasi** | Linux Mint, Ubuntu, Debian, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 (x86_64) |
+| **Prosesor (CPU)** | Intel Core i3 Gen 4 / AMD Athlon (Wajib SSE4.2) | Intel Core i5 / i7 atau AMD Ryzen |
+| **Grafis (GPU)** | Intel HD 4400 / 520, AMD Radeon R5 (Wajib Vulkan 1.1) | Intel HD 620 / Iris Xe / AMD Vega / GPU dedicated |
+| **RAM** | 4 GB | 8 GB |
+| **Penyimpanan** | ~4 GB ruang kosong | SSD |
 
 ---
 
 ## 🎮 Kontrol
 
-### Keyboard (Skema Balap PC WASD Murni)
+### Keyboard (WASD)
 
-Kontrol sudah dikonfigurasi sejak awal agar sesuai tata letak PC Need for Speed kanonik tanpa konflik tombol:
-
-| Aksi | Tombol | Deskripsi |
+| Aksi | Tombol | Keterangan |
 |---|:---:|---|
-| **Gas / Akselerasi** | `W` | Pedal gas utama (Right Trigger) |
-| **Rem / Mundur** | `S` | Rem kaki dan mundur (Left Trigger) |
-| **Belok Kiri** | `A` | Putar roda ke kiri (Analog stick) |
-| **Belok Kanan** | `D` | Putar roda ke kanan (Analog stick) |
-| **Handbrake / Drift** | `Spacebar` | Rem tangan untuk power slide dan tikungan tajam |
-| **Naik Gigi (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi pada mode Drag Race (Right Stick Up) |
-| **Turun Gigi (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi pada mode Drag Race (Right Stick Down) |
-| **Nitrous (NOS)** | `Left Shift` | Boost nitrous oksida |
-| **Speedbreaker** | `X` | Slow motion bullet-time |
-| **Lihat Belakang (Rear View)** | `C` | Melihat ke belakang mobil |
-| **Ganti Kamera** | `V` | Beralih antara Bumper, Hood, Chase Close, dan Chase Far |
-| **Klakson** | `H` | Membunyikan klakson |
-| **Reset Mobil** | `R` | Mengembalikan kendaraan ke jalan |
-| **Jeda Game** | `Escape` | Menu jeda |
-| **Navigasi Menu** | `Tombol Panah` | Menelusuri opsi menu dengan aman |
-| **Pilih / Enter** | `Enter` | Mengkonfirmasi pilihan |
-| **Menu Pengaturan Port** | `F10` | Menu overlay dalam game (rebind tombol, lihat FPS, sesuaikan grafis) |
+| **Gas / Akselerasi** | `W` | Pedal gas |
+| **Rem / Mundur** | `S` | Rem kaki dan mundur |
+| **Belok Kiri** | `A` | Kemudi kiri |
+| **Belok Kanan** | `D` | Kemudi kanan |
+| **Rem Tangan / Drift** | `Spasi` | Handbrake |
+| **Oper Gigi Naik (Drag / Manual)** | `Page Up` / `Numpad 8` | Naik gigi |
+| **Oper Gigi Turun (Drag / Manual)** | `Page Down` / `Numpad 5` | Turun gigi |
+| **Nitro (NOS)** | `Shift Kiri` | Nitro boost |
+| **Speedbreaker** | `X` | Efek gerak lambat |
+| **Lihat Belakang** | `C` | Spion belakang |
+| **Ganti Kamera** | `V` | Ganti sudut pandang |
+| **Klakson** | `H` | Bunyikan klakson |
+| **Reset Posisi Mobil** | `R` | Kembalikan mobil ke jalan |
+| **Jeda / Pause** | `Escape` | Menu pause |
+| **Navigasi Menu** | `Tombol Panah` | Navigasi menu |
+| **Pilih / Enter** | `Enter` | Konfirmasi pilihan |
+| **Menu Pengaturan Port** | `F10` | Atur tombol dan grafis |
 
-### Gamepad (Xbox, PlayStation, USB Generik)
-Dukungan controller plug-and-play melalui SDL3:
-- **Gas / Akselerasi**: Right Trigger (`RT` / `R2`)
-- **Rem / Mundur**: Left Trigger (`LT` / `L2`)
-- **Belok**: Left Analog Stick
-- **Naik Gigi (Drag / Manual)**: Right Analog Stick Up
-- **Turun Gigi (Drag / Manual)**: Right Analog Stick Down
-- **Handbrake**: `A` (Xbox) / `Cross` (PlayStation)
-- **Nitrous**: `B` (Xbox) / `Circle` (PlayStation)
-- **Speedbreaker**: `X` (Xbox) / `Square` (PlayStation)
-- **Lihat Belakang**: `Y` (Xbox) / `Triangle` (PlayStation)
+### Gamepad (Xbox, PlayStation, USB)
+Mendukung gamepad otomatis via SDL3:
+- **Gas**: Pemicu Kanan (`RT` / `R2`)
+- **Rem / Mundur**: Pemicu Kiri (`LT` / `L2`)
+- **Kemudi**: Stik Analog Kiri
+- **Oper Gigi Naik / Turun**: Stik Analog Kanan Atas / Bawah
+- **Rem Tangan**: `A` (Xbox) / `Silang` (PlayStation)
+- **Nitro**: `B` (Xbox) / `Lingkaran` (PlayStation)
+- **Speedbreaker**: `X` (Xbox) / `Kotak` (PlayStation)
+- **Lihat Belakang**: `Y` (Xbox) / `Segitiga` (PlayStation)
 - **Jeda**: `Start` / `Options`
 
 ---
 
-## 🛠️ Membangun dari Sumber
-
-Jika Anda ingin memodifikasi runtime host atau membangun dari sumber:
+## 🛠️ Kompilasi dari Source
 
 ```bash
-# 1. Clone repositori
 git clone https://github.com/Katon17/nfsmw-linux.git
 cd nfsmw-linux
-
-# 2. Bangun library host, recompiler, dan paket
 ./build-from-source.sh --deb
 ```
 
-Paket yang dihasilkan akan dibuat di `release/nfsmw-linux_0.1.13_amd64.deb`.
+Paket `.deb` hasil kompilasi akan tersimpan di `release/nfsmw-linux_0.1.13_amd64.deb`.
 
 ---
 
-## 🔧 Pemecahan Masalah & Solusi Masalah Populer
+## 🔧 Pemecahan Masalah (Troubleshooting)
 
-### 1. Linking Gagal pada Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
-* **Penyebab**: Terjadi konflik simbol stub antara library host dan linker pada sistem tertentu.
-* **Solusi**: Seluruh stub input dan host telemetry telah di-bake secara internal langsung di `libnfsmw_host.a` dengan *weak symbols* dan linker flag `--allow-multiple-definition`. Cukup install update:
-  ```bash
-  sudo dpkg -i nfsmw-linux_0.1.13_amd64.deb
-  nfsmw-linux --rebuild
-  ```
+Error linking di Step 3/3:
+Kalau muncul undefined symbol saat compile, pastikan pakai versi v0.1.13 atau rebuild dengan:
+```bash
+nfsmw-linux --rebuild
+```
 
-### 2. Freeze / Stuck Loading setelah Mengalahkan SLR McLaren Hitam (Prologue Race 2)
-* **Penyebab**: 
-  1. Vulkan Fence deadlock (`UINT64_MAX` menunggu GPU tak terhingga saat transisi FMV/cutscene ke race berikutnya).
-  2. Partisi cache sementara Xbox (`hdd/X`, `hdd/Y`, `hdd/Z`) menyimpan dump sementara yang korup saat transisi loading.
-  3. Pemutaran FMV transisi tidak merespons tombol lewati (*skip*).
-* **Solusi di v0.1.4**:
-  - Vulkan fence timeout dibatasi maksimal 5 detik (`kGpuWaitTimeoutNs`) untuk mencegah GPU hang tanpa henti.
-  - Penanganan transfer image Vulkan di-upgrade ke `Retire(down)` agar tekstur in-flight tidak terhapus prematur.
-  - Cutscene transisi kini dapat dilewati secara manual kapan saja dengan menekan **Enter** atau **Spacebar** / Gamepad **A**.
-  - Partisi scratch cache Xbox (`X`, `Y`, `Z`) dibersihkan otomatis pada setiap boot game tanpa menyentuh progress save karier (`hdd/E/UDATA`).
-  - Pembersihan cache shader manual dapat dijalankan dengan:
-    ```bash
-    nfsmw-linux --clean-cache
-    ```
+Cutscene prolog:
+Kamu bisa lewati video prolog pakai tombol Spacebar atau Enter. Kalau mau bersihkan cache shader:
+```bash
+nfsmw-linux --clean-cache
+```
 
 ---
 
-## 📁 Lokasi File
+## 📁 Lokasi Berkas
 
-* **Simpanan Game & Profil Karier**: `~/.local/share/nfsmw-linux/hdd/` (penyimpanan virtual Xbox, aman antar pembaruan)
-* **File Konfigurasi**: `~/.local/share/nfsmw-linux/mostwanted.toml`
+* **Save Game & Profil Career**: `~/.local/share/nfsmw-linux/hdd/`
+* **Berkas Konfigurasi**: `~/.local/share/nfsmw-linux/mostwanted.toml`
 * **Cache Shader Vulkan**: `~/.local/share/nfsmw-linux/mesa_cache/`
-* **Biner Game Terkompilasi**: `~/.local/share/nfsmw-linux/bin/MOSTWANTED`
+* **Biner Game**: `~/.local/share/nfsmw-linux/bin/MOSTWANTED`
 
 ---
 
-## ☕ Dukungan & Donasi
+## ☕ Donasi & Dukungan
 
-Jika proyek ini bermanfaat bagi Anda dan komunitas Linux gaming, Anda dapat mendukung pengembangannya melalui:
 * 💰 **Saweria**: [saweria.co/Kabako](https://saweria.co/Kabako)
 * ☕ **Ko-fi**: [ko-fi.com/katonbagaskoro](https://ko-fi.com/katonbagaskoro)
 * 📺 **YouTube**: [@KabakoNT](https://www.youtube.com/@KabakoNT)
@@ -321,18 +160,12 @@ Jika proyek ini bermanfaat bagi Anda dan komunitas Linux gaming, Anda dapat mend
 
 ---
 
-## ⚖️ Lisensi
-
-Proyek ini dilisensikan di bawah **GNU General Public License v3.0 (GPL-3.0)** — lihat [LICENSE](LICENSE). Kamu bebas menggunakan, memodifikasi, dan mendistribusikannya, dengan syarat karya turunan tetap open-source di bawah lisensi yang sama.
-
----
-
-## 📜 Kredit & Pengakuan
+## 📜 Kredit & Lisensi
 
 * **Maintainer Desktop Linux**: [Katon Bagaskoro (@Katon17)](https://github.com/Katon17)
-* **Runtime Host Android Hulu**: [RanggaCasper/MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android)
-* **Recompiler Statis Xbox**: [TGP482/XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp)
-* **Proyek SpeedBreaker**: [SpeedBreakerProject/speedbreaker](https://github.com/SpeedBreakerProject/speedbreaker)
-* **Library**: [SDL3](https://github.com/libsdl-org/SDL), [glslang](https://github.com/KhronosGroup/glslang), [Dear ImGui](https://github.com/ocornut/imgui), [toml++](https://github.com/marzer/tomlplusplus), [Zydis](https://github.com/zyantific/zydis).
+* **Host Runtime Android Upstream**: [RanggaCasper/MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android)
+* **Static Recompiler Xbox**: [TGP482/XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp)
+* **SpeedBreaker Project**: [SpeedBreakerProject/speedbreaker](https://github.com/SpeedBreakerProject/speedbreaker)
+* **Pustaka**: [SDL3](https://github.com/libsdl-org/SDL), [glslang](https://github.com/KhronosGroup/glslang), [Dear ImGui](https://github.com/ocornut/imgui), [toml++](https://github.com/marzer/tomlplusplus), [Zydis](https://github.com/zyantific/zydis).
 
-*Disclaimer: Need for Speed™ dan Need for Speed: Most Wanted adalah merek dagang terdaftar milik Electronic Arts Inc. Ini adalah proyek pelestarian open-source non-resmi dan non-komersial. Tidak ada biner atau aset berhak cipta EA yang didistribusikan.*
+Need for Speed adalah merek dagang Electronic Arts. Saya tidak terafiliasi dengan EA, proyek ini dibuat untuk kesenangan dan preservasi game. Kamu butuh file ISO Xbox sendiri untuk memainkannya.

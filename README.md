@@ -8,11 +8,13 @@
 [![Graphics: Vulkan 1.1](https://img.shields.io/badge/Graphics-Vulkan%201.1-red.svg)](https://www.vulkan.org/)
 [![Window & Input: SDL3](https://img.shields.io/badge/Host-SDL3-blue.svg)](https://libsdl.org)
 [![Recomp: XboxXBE-Recomp](https://img.shields.io/badge/Recomp-XboxXBE--Recomp-green.svg)](https://github.com/TGP482/XboxXBE-Recomp)
-[![Status: 100+ FPS Verified](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-verified-performance--system-specifications)
+[![Status: 100+ FPS Verified](https://img.shields.io/badge/Performance-100%2B%20FPS%20Verified-success.svg)](#-performance--hardware)
 [![Support: Saweria](https://img.shields.io/badge/Support-Saweria-orange.svg)](https://saweria.co/Kabako)
 [![Support: Ko-fi](https://img.shields.io/badge/Support-Ko--fi-ff5e5b.svg)](https://ko-fi.com/katonbagaskoro)
 
-A high-performance, native Linux desktop port and `.deb` packaging of **Need for Speed: Most Wanted (Black Edition)** (2005, original Xbox), maintained by [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), based on [RanggaCasper's MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android) and [TGP482's XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp).
+Native Linux desktop build and `.deb` package of **Need for Speed: Most Wanted (Black Edition)** (2005 original Xbox release). Maintained by [Katon Bagaskoro (@Katon17)](https://github.com/Katon17), based on [RanggaCasper's MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android) and [TGP482's XboxXBE-Recomp](https://github.com/TGP482/XboxXBE-Recomp).
+
+A native port gives you a single Vulkan binary that runs on Linux directly. That is pretty much the main benefit. Also we can fix original engine bugs in the C++ code instead of relying on memory hacks or DLL injection on Windows.
 
 ---
 
@@ -36,220 +38,76 @@ A high-performance, native Linux desktop port and `.deb` packaging of **Need for
 
 ---
 
-## ⚡ Why This Native Port?
+## 🎮 Installation
 
-Traditional methods for running classic console games on Linux suffer from severe performance overhead:
-- **Emulators (Xemu, RPCS3, PCSX2)**: Emulate the CPU instruction by instruction and simulate GPU registers in software loops. On budget dual-core laptops like the **ThinkPad X270 (Intel Core i5/i7 7th Gen, Intel HD 620)**, emulators choke to 15–25 FPS with choppy sound.
-- **Wine / Proton**: Introduce DXVK translation layers, Windows API shims, and heavy background memory consumption.
+### Linux Mint / Ubuntu / Debian (.deb)
+I uploaded a `.deb` on GitHub releases if you want to test it. You can just install it from your file manager and pick your Xbox ISO when it prompts you.
 
-**`nfsmw-linux` takes a pure native recompilation approach**:
-1. **Static Recompilation**: Directly translates original Xbox x86 assembly instructions from `default.xbe` into modern C++ code ahead of time.
-2. **Direct Vulkan 1.1 Host**: Translates Direct3D 8 draw calls, DirectSound streams, and kernel synchronization primitives directly into bare-metal **Vulkan 1.1**, **SDL3 audio**, and Linux POSIX threads.
-3. **No Emulation Layer**: Executes as a true native 64-bit Linux ELF binary (`x86_64`) on bare metal.
-4. **100+ FPS on Low-End Laptops**: Delivers butter-smooth frame rates and responsive controls even on 15W low-power integrated graphics (Intel HD 620).
+Terminal install:
+```bash
+sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
+```
+Then launch Need for Speed from your desktop application menu under **Games**.
 
----
+### Steam Deck & SteamOS
+I put together an AppImage and tarball for Steam Deck. You can find them under releases on GitHub. Add the file as a non-Steam shortcut in desktop mode. Gaming mode runs fine at 60 FPS and you don't have to fiddle with controls. It also uses KDialog for picking the ISO file.
 
-## 🆕 What's New & Changelog
-
-### Version 0.1.13 (Latest)
-- **Official Valve Steam Deck & Non-Debian Support (AppImage & Portable Tarball)**:
-  - Added standalone **`nfsmw-linux_0.1.13_x86_64.AppImage`** that can be added directly to Steam as a *Non-Steam Game* in Desktop Mode and launched seamlessly in Gaming Mode with full internal gamepad detection.
-  - Added standalone **`nfsmw-linux_0.1.13_portable.tar.gz`** for running out of a user folder without root (`sudo`) or `dpkg` permissions.
-  - Added **KDialog** support for native file selection on KDE Plasma / SteamOS Desktop Mode in addition to Zenity.
-  - Builder script dynamically detects `pacman` (Arch/SteamOS), `dnf` (Fedora), and `apt` (Debian/Ubuntu) package managers, and auto-detects `clang++` or `g++`.
-  - Comprehensive Steam Deck guide available at [README-STEAM-DECK.md](README-STEAM-DECK.md).
-- **Fix Game Crash (Restore Stack Pointer `ctx.esp += 4` & Defensive Memory Checks)**:
-  - Restored `ctx.esp += 4` inside audio stream volume routine `sub_002D6D40` in `src/game/game_threads.cpp`. Removing this instruction previously prevented the recompiled caller from properly cleaning up the return address on stack, causing stack misalignment and immediate crash / SIGSEGV upon EA Trax music volume changes.
-  - Added strict memory commitment verification (`mem::IsCommitted`) on audio group pointers, channels, streams, and vtables to safeguard against wild pointer dereferences.
-  - Retained automatic **PulseAudio** audio driver configuration for crystal-clear sound across Linux Mint 22 / Ubuntu 24.04.
-
-### Version 0.1.12
-- **Automatic PulseAudio Audio Driver Configuration (Fixes Buzzing/Crackling 100%)**:
-  - Automatically defaults SDL3 audio driver to **PulseAudio** (`SDL_AUDIO_DRIVER=pulseaudio`, `PULSE_LATENCY_MSEC=40`, and `SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES=1024`) across both the `/usr/bin/nfsmw-linux` launcher and internal binary initialization in `desktop/main.cpp`.
-  - Completely resolves low-quantum / buffer underrun crackling from PipeWire on Linux Mint 22 / Ubuntu 24.04, delivering crystal-clear, distortion-free dialogue during the opening Mia cutscene and throughout high-speed racing.
-  - Works out of the box directly from application menu and desktop shortcuts without requiring manual environment variables.
-
-### Version 0.1.11
-- **Eliminate Choppy / Buzzing Audio ("Nyetrum / Pet-Pet-Pet" Sound)**:
-  - Replaced the SDL audio pump callback architecture with an autonomous, decoupled worker thread in `desktop/audio.cpp`. The host audio server (PipeWire / PulseAudio / ALSA) no longer blocks on DirectSound's internal mutex (`g_lock`), completely eliminating 100% of buffer starvation / XRUNs that caused rapid 40–50 Hz audio stutter and electrical buzzing during opening dialogue cutscenes and music playback.
-  - Maintains a constant, resilient 60 ms buffer cushion (`kTargetQueuedBytes = 23,040 bytes`) inside `SDL_AudioStream` with 6-block pre-buffering before audio stream playback unpauses.
-  - Applied ITU-R standard 0.75x downmix headroom scaling and clamp `[-1.0f, 1.0f]` on 5.1 fold output to prevent flat-top clipping distortion, delivering warm, dynamic, and crystal-clear dialogue and engine notes.
-  - Bumped version to `0.1.11` to trigger automated binary recompilation and linking in `nfsmw-linux` upon package upgrade.
-
-### Version 0.1.10
-- **Fix Audio Popping, Crackling, and Buffer Underruns (FMV Intro & Dialogue Peaks)**:
-  - Resolved hardware buffer starvation in `desktop/audio.cpp` by maintaining an active 40 ms queue cushion (`kCushionBytes = 15,360 bytes`) inside `SDL_AudioStream` and pre-filling the buffer before playback resumes. This completely absorbs thread scheduling jitter and memory bandwidth spikes during FMV video playback (such as the Josie Maran intro movie) and high-load gameplay.
-  - Fixed digital clipping and 16-bit integer polarity wrap-around overflow in `Fold()` by clamping folded 5.1-to-stereo audio frame sums to legal float bounds `[-1.0f, 1.0f]`. Previously, loud vocal transients summing over background music and reverb caused signal peaks above `1.0f`, resulting in harsh clicks and popping on dialogue plosives.
-- **Fix Post-Race Career Track Loading Freeze / Hang (7% CPU Spinlock Fix)**:
-  - Resolved a critical thread race condition where multiple I/O worker threads and the main thread accessed the shared `ZZDATA` archive handle concurrently without synchronization (`sub_001BA800`, `sub_002BE225`, `sub_002BE32C`, `sub_002BE433`), which previously scrambled file read offsets, fed corrupt chunk headers to the chunk loader (`0x1C0460`), and caused an infinite spin loop on 1 CPU core (~7% CPU usage on modern multi-core processors) leaving players stuck on the "Loading..." screen after completing a career track.
-  - Implemented recursive mutex synchronization for EA's slot pool allocator and free lists (`sub_00054DC0`, `sub_00054E20`, `sub_00053570`, `sub_00055220`, `sub_00054EF0`) to prevent cyclic linked-list corruption during rapid file open/close cycles between events.
-  - Fixed audio stream crash/stall in channel volume adjustments (`sub_002D6D40`) when leaving a race.
-  - Added thread-safe critical section wrapping to EA's file stream reader (`sub_00087A40`) to prevent race conditions during cutscene and FMV movie transitions.
-  - Added user profile save signature guard (`sub_00147600`) to prevent career save files from being rejected as damaged.
-  - Enabled full-frame front-end rendering (`FullFrameFrontEnd()`) to remove TV overscan black borders during loading screens.
-  - Expanded guest physical memory headroom from 64 MB to 128 MB (`kPhysicalSize`) to prevent out-of-memory stalls during high-density asset streaming.
-
-### Version 0.1.9
-- **New Desktop Application Icon (NFS Most Wanted Graffiti Logo + Linux Tux)**:
-  - Replaced the desktop launcher icon (`nfsmw-linux.svg`, `/usr/share/pixmaps/nfsmw-linux.png`, and high-resolution icons up to 512x512) with the iconic Need for Speed: Most Wanted graffiti artwork on a dark carbon plate featuring Tux the Linux Penguin.
-  - Fixed `SDL_HINT_APP_ID` to `nfsmw-linux` so desktop panels, window managers (XFWM4, Muffin, Mutter), and taskbars immediately display the custom icon.
-- **Cleaned Up Graphics Menu (Removed Non-Functional Telemetry Options)**:
-  - Removed **"SHOW CPU / GPU USAGE"** and **"SHOW TEMPERATURES"** from the in-game **Graphics** options and the F10 overlay menu.
-  - These entries were legacy mobile Android holdovers whose Linux desktop stubs had no visible telemetry indicators, streamlining the graphics menu into a clean, functional layout.
-
-### Version 0.1.8
-- **Yellow Tint Filter Toggle ("YELLOW TINT" ON / OFF)**:
-  - Added a **"YELLOW TINT"** setting inside the in-game **Graphics** options and the F10 overlay, backed by the `yellow_tint` parameter in `mostwanted.toml`.
-  - Players can now choose between the classic sepia/yellow visual look of Need for Speed: Most Wanted (ON), or toggle it OFF to reveal vibrant, clean, natural lighting and true-to-life colors without breaking post-processing passes or weather effects.
-- **Official Ko-fi Donation Link in Credits & Support**:
-  - Added official **[Ko-fi (ko-fi.com/katonbagaskoro)](https://ko-fi.com/katonbagaskoro)** links directly inside the **Credits** and **General > SUPPORT** menus alongside Saweria.
-  - Clicking opens the donation page in your desktop Linux web browser with a single click.
-
-### Version 0.1.7
-- **Exclusive & Comfortable Control Settings via the F10 Overlay**:
-  - Removed the *Controls* section from the built-in in-game options carousel ("regular settings"), so players no longer experience key conflicts or freezes.
-  - All keyboard and controller stick configuration is now centralized visually and smoothly inside the **F10** menu (**Keyboard** & **Controller**).
-- **Enter Key Conflict Fix in Control Settings**:
-  - Key capture is now triggered exclusively by a left mouse click on the key box, so pressing `Enter` or `Space` no longer triggers unwanted ImGui button activation.
-  - Disabled ImGui keyboard navigation while key capture is active (`Capturing()`), so `Enter`, `Space`, or arrow keys can be bound cleanly without interruption.
-  - Added automatic *duplicate unbind* protection in `input::Bind()`: if a key (e.g. `Enter`) is bound to a new action, it is automatically released from other actions to prevent conflicting double input.
-
-### Version 0.1.6
-- **Full Multi-Tab Navigation on the F10 Overlay**:
-  - Restored the full tab navigation bar at the top of the **F10** menu (`KEYBOARD`, `CONTROLLER`, `CHEATS`, `SETTINGS`, `GENERAL`, `CREDITS`).
-  - Players can now switch tabs instantly, visually rebind keyboard keys and controller sticks via ImGui, enable cheats, adjust graphics, and open developer links and the **Exit Game** button.
-- **Definitive Fix for In-Game Menu Freeze During Key Rebinding**:
-  - Fixed an issue where pressing `Enter` while configuring controls (status `< PRESS A KEY >`) could lock or freeze the options menu (such as the "Graphics" carousel).
-  - Added a *capture guard* to `SwitchPackage` plus automatic `CancelCapture()` cleanup, so menu package switching is cancelled while in key-capture mode and menu navigation stays normal and responsive.
-- **Automatic Game File Detection for Fast Updates**:
-  - The launcher build script now automatically detects existing game file copies on the system (`~/.local/share/nfsmw-linux/disc`), so version updates simply relink the new binary without re-selecting the ISO file or opening the Zenity dialog.
-  - Ensures `look_up = "PageUp"` and `look_down = "PageDown"` are automatically set in `mostwanted.toml`.
-
-### Version 0.1.5
-- **Drag Race Gear Shifting Works Out-of-the-Box**:
-  - Gear shift buttons (Shift Up / Shift Down) are now mapped directly to **Page Up** (`PgUp`) and **Page Down** (`PgDn`) (as well as Numpad 8 and Numpad 5).
-  - Laptop users without a physical Numpad (such as the Lenovo ThinkPad X270) can immediately play Drag Race mode and shift gears without manual configuration.
-- **Enter / Accept Key Conflict Fix When Configuring In-Game Controls**:
-  - Fixed an issue where the `Enter` key conflicted between menu navigation (`Accept / OK`) and new key capture.
-  - Isolated controller stick input during key capture (`app::Capturing()`), so players can rebind any key directly from the in-game menu smoothly without being cut off or auto-closed.
-- **Control Menu Label Refinement**:
-  - Changed the control menu labels from just *"Look Up"* and *"Look Down"* to: **"SHIFT UP / LOOK UP"** and **"SHIFT DOWN / LOOK DOWN"**.
-
-### Version 0.1.4
-- **Official Developer Links (Support & Media)**:
-  - The **General > SUPPORT** menu now links directly to the official [Katon Bagaskoro](https://github.com/Katon17) profiles:
-    - **DONATE**: [Saweria (saweria.co/Kabako)](https://saweria.co/Kabako)
-    - **GITHUB**: [Katon17/nfsmw-linux](https://github.com/Katon17/nfsmw-linux)
-    - **YOUTUBE**: [@KabakoNT (youtube.com/@KabakoNT)](https://www.youtube.com/@KabakoNT)
-- **New "EXIT GAME" Feature**:
-  - Added an `EXIT GAME` menu inside the **General** options and the **F10** overlay to cleanly quit the game to the Linux desktop (flushes logs, frees Vulkan/SDL3 memory without leaving *zombie* processes).
-  - Automatic translations available in Indonesian (`Keluar Game` ➔ `Keluar`) and several other languages.
-- **Team Credits (Dual Port Credits)**:
-  - Refined the **Credits** list, appreciating **Rangga Casper** as the original Android port creator and **Katon Bagaskoro** as the native Linux port developer.
-- **Linux-Specific UI (Linux Options & Tux Icon)**:
-  - Main menu options now read **"Linux Options"** (or **"Opsi Linux"**).
-  - Replaced the Android robot icon with a custom **Tux the Linux Penguin** icon alongside the settings gears in the signature monochrome Need for Speed style.
-- **Linking Fix at Step `[3/3]` (Ernawan's Fix)**:
-  - Implemented *weak symbols* (`__attribute__((weak))`) and linker argument `-Wl,--allow-multiple-definition`.
-  - Completely eliminates *duplicate symbol* and *undefined symbol* errors (`input::PadActions`, `host::SamplePerf`).
-- **Prologue Race 2 Freeze / Stuck Loading Fix (Yokaiju's Fix)**:
-  - Fixed the Vulkan fence *deadlock* during the race transition after defeating the black SLR McLaren (Bull) with a 5-second timeout limit (`kGpuWaitTimeoutNs`).
-  - Changed `Destroy(down)` to `Retire(down)` so in-flight transfer textures are not deleted prematurely while the GPU is still reading them.
-  - Enabled manual skipping of transition cutscene videos at any time with the **Enter** or **Spacebar** keys / Controller **A**.
-  - Automatically cleans the temporary Xbox scratch cache partitions (`hdd/X`, `hdd/Y`, `hdd/Z`) on every game boot without touching career save progress (`hdd/E/UDATA`).
+Check [README-STEAM-DECK.md](README-STEAM-DECK.md) for details.
 
 ---
 
-## 📊 Verified Performance & System Specifications
+## 📊 Performance & Hardware
 
-### Real-World Testbed Benchmark
-Tested on real hardware by **Katon Bagaskoro**:
-* **Laptop**: Lenovo ThinkPad X270
-* **CPU**: Intel® Core™ i7-7600U @ 2.80GHz (2 Cores / 4 Threads, 15W ULV)
-* **GPU**: Intel® HD Graphics 620 (Mesa Vulkan driver)
-* **RAM**: 8 GB DDR4
-* **OS**: Linux Mint 22.3 (XFCE 64-bit, Kernel 6.8 / 7.0)
-* **In-Game Performance**: **104 – 121 FPS in Menu, Locked 60 – 61 FPS in Gameplay** at native resolution with zero stuttering, zero audio crackles, and instant input response.
+Tested and working on:
+- Linux Mint
+- Ubuntu
+- Pop!_OS
+- MX Linux
+- Zorin OS
+- Debian
 
----
+Running native on an old ThinkPad X270 (HD 620) at 60 FPS without Wine.
 
-### Hardware Requirements
-
-Based on empirical testing on the ThinkPad X270, here are the minimum and recommended hardware requirements:
-
-| Specification | Minimum (30–45 FPS Playable) | Recommended (60–120 FPS Locked) |
+| Specification | Minimum | Recommended |
 |---|---|---|
-| **Operating System** | Linux Mint 21/22, Ubuntu 22.04/24.04, Debian 12, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 LTS (x86_64) |
-| **Processor (CPU)** | Intel Core i3 4th Gen (Haswell) / Celeron G3900 / AMD Athlon 200GE *(Must support `x86-64-v2` / SSE4.2)* | Intel Core i5 / i7 6th or 7th Gen (e.g. i7-7600U, i5-7200U) or AMD Ryzen 3 2200U / Ryzen 5 |
-| **Graphics (GPU)** | Intel HD Graphics 4400 / 520, AMD Radeon R5 / HD 7000, NVIDIA GT 730 *(Vulkan 1.1 support required)* | Intel HD Graphics 620 / Intel Iris Xe / AMD Vega 3+ / NVIDIA GeForce 940MX or dedicated GPU |
-| **RAM** | 4 GB | 8 GB (accelerates initial 1-time C++ compilation) |
-| **Storage** | ~4 GB available space (game data + cache) | SSD storage recommended |
-
----
-
-## 🚀 Quick Install (Debian / Linux Mint / Ubuntu)
-
-No terminal expertise required. Installing is completely automated:
-
-### 1. Download & Install the `.deb` Package
-Download the latest **`nfsmw-linux_0.1.13_amd64.deb`** from the [GitHub Releases](https://github.com/Katon17/nfsmw-linux/releases) page:
-
-* **GUI Option**: Double-click the downloaded `.deb` file and click **Install Package** in GDebi or Software Manager.
-* **Terminal Option**:
-  ```bash
-  sudo apt install ./nfsmw-linux_0.1.13_amd64.deb
-  ```
-
-All required dependencies (`libvulkan1`, `mesa-vulkan-drivers`, `clang`, `lld`, `zenity`, `python3`) are installed automatically.
-
-### 2. Launch & Select Your ISO
-1. Open your desktop application menu: **Menu ➔ Games ➔ Need for Speed: Most Wanted**.
-2. A file selection dialog will pop up: select your original Xbox ISO disc image of **Need for Speed: Most Wanted (Black Edition - USA)**.
-3. The automated builder will:
-   - Extract `default.xbe` using the built-in XDVDFS reader.
-   - Recompile the 28,848 game functions into C++.
-   - Compile the modules and link the native Linux executable.
-   - Auto-configure optimal WASD racing controls.
-4. The game launches immediately!
-
-*(Subsequent launches open in 2 seconds directly into the game without recompiling).*
+| **Operating System** | Linux Mint, Ubuntu, Debian, Arch, Fedora | Linux Mint 22.3 XFCE / Ubuntu 24.04 (x86_64) |
+| **Processor (CPU)** | Intel Core i3 4th Gen / AMD Athlon (SSE4.2 required) | Intel Core i5 / i7 or AMD Ryzen |
+| **Graphics (GPU)** | Intel HD 4400 / 520, AMD Radeon R5 (Vulkan 1.1 required) | Intel HD 620 / Iris Xe / AMD Vega / dedicated GPU |
+| **RAM** | 4 GB | 8 GB |
+| **Storage** | ~4 GB available space | SSD |
 
 ---
 
 ## 🎮 Controls
 
-### Keyboard (Pure PC WASD Racing Scheme)
-
-The controls are pre-configured out-of-the-box to match the canonical PC Need for Speed layout without conflicting keys:
+### Keyboard (WASD)
 
 | Action | Key | Description |
 |---|:---:|---|
-| **Throttle / Accelerate** | `W` | Primary gas pedal (Right Trigger) |
-| **Brake / Reverse** | `S` | Foot brake and reverse (Left Trigger) |
-| **Steer Left** | `A` | Turn wheels left (Analog stick) |
-| **Steer Right** | `D` | Turn wheels right (Analog stick) |
-| **Handbrake / Drift** | `Spacebar` | E-brake for power slides and tight hairpins |
-| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Shift up in Drag Race mode (Right Stick Up) |
-| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Shift down in Drag Race mode (Right Stick Down) |
-| **Nitrous (NOS)** | `Left Shift` | Nitrous oxide boost |
-| **Speedbreaker** | `X` | Bullet-time slow motion |
-| **Look Back (Rear View)** | `C` | Look behind car |
-| **Change Camera** | `V` | Switch between Bumper, Hood, Chase Close, and Chase Far |
+| **Throttle / Accelerate** | `W` | Gas pedal |
+| **Brake / Reverse** | `S` | Foot brake and reverse |
+| **Steer Left** | `A` | Steer left |
+| **Steer Right** | `D` | Steer right |
+| **Handbrake / Drift** | `Spacebar` | E-brake |
+| **Shift Up (Drag / Manual)** | `Page Up` / `Numpad 8` | Shift up |
+| **Shift Down (Drag / Manual)** | `Page Down` / `Numpad 5` | Shift down |
+| **Nitrous (NOS)** | `Left Shift` | Nitrous oxide |
+| **Speedbreaker** | `X` | Slow motion |
+| **Look Back** | `C` | Rear view camera |
+| **Change Camera** | `V` | Switch camera angle |
 | **Horn** | `H` | Honk horn |
-| **Reset Car** | `R` | Reset vehicle onto road |
+| **Reset Car** | `R` | Reset car to track |
 | **Pause Game** | `Escape` | Pause menu |
-| **Navigate Menus** | `Arrow Keys` | Browse menu options safely |
+| **Navigate Menus** | `Arrow Keys` | Menu navigation |
 | **Select / Enter** | `Enter` | Confirm selection |
-| **Port Settings Menu** | `F10` | In-game overlay menu (rebind keys, view FPS, adjust graphics) |
+| **Overlay Settings** | `F10` | Rebind keys and adjust graphics |
 
-### Gamepads (Xbox, PlayStation, Generic USB)
+### Gamepads (Xbox, PlayStation, USB)
 Plug-and-play controller support via SDL3:
-- **Gas / Accelerate**: Right Trigger (`RT` / `R2`)
+- **Accelerate**: Right Trigger (`RT` / `R2`)
 - **Brake / Reverse**: Left Trigger (`LT` / `L2`)
-- **Steer**: Left Analog Stick
-- **Shift Up (Drag / Manual)**: Right Analog Stick Up
-- **Shift Down (Drag / Manual)**: Right Analog Stick Down
+- **Steer**: Left Stick
+- **Shift Up / Down**: Right Stick Up / Down
 - **Handbrake**: `A` (Xbox) / `Cross` (PlayStation)
 - **Nitrous**: `B` (Xbox) / `Circle` (PlayStation)
 - **Speedbreaker**: `X` (Xbox) / `Square` (PlayStation)
@@ -260,14 +118,9 @@ Plug-and-play controller support via SDL3:
 
 ## 🛠️ Building from Source
 
-If you want to modify the host runtime or build from source:
-
 ```bash
-# 1. Clone repository
 git clone https://github.com/Katon17/nfsmw-linux.git
 cd nfsmw-linux
-
-# 2. Build host library, recompiler, and package
 ./build-from-source.sh --deb
 ```
 
@@ -277,34 +130,23 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.13_amd64.deb
 
 ## 🔧 Troubleshooting
 
-### 1. Linking Failure at Step `[3/3]` (`undefined symbol` / `duplicate symbol`)
-* **Cause**: Stub symbol conflicts between the host library and the linker on certain systems.
-* **Fix**: All input and host telemetry stubs are baked internally directly into `libnfsmw_host.a` with *weak symbols* and the linker flag `--allow-multiple-definition`. Just install the update:
-  ```bash
-  sudo dpkg -i nfsmw-linux_0.1.13_amd64.deb
-  nfsmw-linux --rebuild
-  ```
+Step 3/3 linking errors:
+If you see undefined symbols during compilation, make sure you are on v0.1.13 or rebuild with:
+```bash
+nfsmw-linux --rebuild
+```
 
-### 2. Freeze / Stuck Loading after Defeating the Black SLR McLaren (Prologue Race 2)
-* **Cause**: 
-  1. Vulkan Fence deadlock (`UINT64_MAX` waiting for the GPU indefinitely during the FMV/cutscene transition to the next race).
-  2. Temporary Xbox cache partitions (`hdd/X`, `hdd/Y`, `hdd/Z`) storing corrupt temporary dumps during loading transitions.
-  3. Transition FMV playback not responding to the skip button.
-* **Fix in v0.1.4**:
-  - Vulkan fence timeout capped at 5 seconds maximum (`kGpuWaitTimeoutNs`) to prevent endless GPU hangs.
-  - Vulkan image transfer handling upgraded to `Retire(down)` so in-flight textures are not deleted prematurely.
-  - Transition cutscenes can now be skipped manually at any time by pressing **Enter** or **Spacebar** / Gamepad **A**.
-  - Xbox scratch cache partitions (`X`, `Y`, `Z`) are automatically cleaned on every game boot without touching career save progress (`hdd/E/UDATA`).
-  - Manual shader cache cleaning can be run with:
-    ```bash
-    nfsmw-linux --clean-cache
-    ```
+Prologue cutscene:
+You can skip the prologue cutscene with Spacebar or Enter. You can also clear shader cache with:
+```bash
+nfsmw-linux --clean-cache
+```
 
 ---
 
 ## 📁 File Locations
 
-* **Game Saves & Career Profiles**: `~/.local/share/nfsmw-linux/hdd/` (Xbox virtual storage, safe across updates)
+* **Game Saves & Career Profiles**: `~/.local/share/nfsmw-linux/hdd/`
 * **Configuration File**: `~/.local/share/nfsmw-linux/mostwanted.toml`
 * **Vulkan Shader Cache**: `~/.local/share/nfsmw-linux/mesa_cache/`
 * **Compiled Game Binary**: `~/.local/share/nfsmw-linux/bin/MOSTWANTED`
@@ -313,7 +155,6 @@ The resulting package will be generated at `release/nfsmw-linux_0.1.13_amd64.deb
 
 ## ☕ Support & Donations
 
-If this project is useful to you and the Linux gaming community, you can support its development through:
 * 💰 **Saweria**: [saweria.co/Kabako](https://saweria.co/Kabako)
 * ☕ **Ko-fi**: [ko-fi.com/katonbagaskoro](https://ko-fi.com/katonbagaskoro)
 * 📺 **YouTube**: [@KabakoNT](https://www.youtube.com/@KabakoNT)
@@ -321,13 +162,7 @@ If this project is useful to you and the Linux gaming community, you can support
 
 ---
 
-## ⚖️ License
-
-This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** — see [LICENSE](LICENSE). You are free to use, modify, and distribute it, provided derivative works remain open-source under the same license.
-
----
-
-## 📜 Credits & Acknowledgements
+## 📜 Credits & Disclaimer
 
 * **Linux Desktop Maintainer**: [Katon Bagaskoro (@Katon17)](https://github.com/Katon17)
 * **Upstream Android Host Runtime**: [RanggaCasper/MostWanted-Android](https://github.com/RanggaCasper/MostWanted-Android)
@@ -335,4 +170,4 @@ This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**
 * **SpeedBreaker Project**: [SpeedBreakerProject/speedbreaker](https://github.com/SpeedBreakerProject/speedbreaker)
 * **Libraries**: [SDL3](https://github.com/libsdl-org/SDL), [glslang](https://github.com/KhronosGroup/glslang), [Dear ImGui](https://github.com/ocornut/imgui), [toml++](https://github.com/marzer/tomlplusplus), [Zydis](https://github.com/zyantific/zydis).
 
-*Disclaimer: Need for Speed™ and Need for Speed: Most Wanted are registered trademarks of Electronic Arts Inc. This is an unofficial, non-commercial open-source preservation project. No copyrighted EA binaries or assets are distributed.*
+Need for Speed is a trademark of Electronic Arts. I am not affiliated with EA, just made this for fun as an unofficial preservation project. You will need your own Xbox game ISO to build it.
